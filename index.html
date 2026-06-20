@@ -3,282 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Math Quiz</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Arial', sans-serif;
-        }
-        body {
-            background-color: #fffdf2;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            height: 100vh;
-            padding: 10px;
-            overflow: hidden;
-        }
-        /* टॉप स्टैट्स बार */
-        .stats-container {
-            width: 100%;
-            max-width: 420px;
-            background-color: white;
-            border-radius: 20px;
-            padding: 15px;
-            display: flex;
-            justify-content: space-around;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            margin-bottom: 25px;
-        }
-        .stat-box {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .stat-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 20px;
-        }
-        .bg-purple { background-color: #f1ecf7; color: #8e44ad; }
-        .bg-green { background-color: #e8f8f5; color: #1abc9c; }
-        .bg-yellow { background-color: #fef9e7; color: #f39c12; }
-        
-        .stat-text div {
-            font-size: 11px;
-            text-transform: uppercase;
-            color: #7f8c8d;
-            font-weight: bold;
-            letter-spacing: 0.5px;
-        }
-        .stat-text span {
-            font-size: 20px;
-            font-weight: bold;
-            color: #2c3e50;
-        }
-
-        /* मुख्य गेम कार्ड */
-        .card {
-            background: white;
-            width: 100%;
-            max-width: 420px;
-            border: 4px solid #1a233d;
-            border-radius: 40px;
-            padding: 40px 25px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            box-shadow: 0 10px 0px #1a233d;
-            position: relative;
-        }
-        .question {
-            font-size: 65px;
-            font-weight: 900;
-            color: #1a233d;
-            margin-bottom: 40px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        .plus-sign {
-            color: #70a1ff;
-        }
-        
-        /* इनपुट बॉक्स */
-        .answer-input {
-            width: 100%;
-            border: 4px solid #9b59b6;
-            border-radius: 20px;
-            padding: 20px;
-            font-size: 40px;
-            font-weight: bold;
-            text-align: center;
-            color: #1a233d;
-            outline: none;
-            margin-bottom: 25px;
-            background-color: transparent;
-        }
-        .answer-input::placeholder {
-            color: #1a233d;
-        }
-
-        /* सबमिट बटन */
-        .submit-btn {
-            width: 100%;
-            background-color: #7d5fff;
-            color: white;
-            font-size: 26px;
-            font-weight: bold;
-            padding: 18px;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            box-shadow: 0 6px 0px #4b2ccb;
-            transition: all 0.1s;
-        }
-        .submit-btn:active {
-            transform: translateY(4px);
-            box-shadow: 0 2px 0px #4b2ccb;
-        }
-
-        /* गलत होने पर फुल स्क्रीन रेड पॉप-अप */
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #ff5252;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-        }
-        .overlay.show {
-            opacity: 1;
-            pointer-events: auto;
-        }
-        .cross-circle {
-            width: 120px;
-            height: 120px;
-            border: 8px solid white;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            font-size: 60px;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-        .try-again-text {
-            color: white;
-            font-size: 45px;
-            font-weight: 900;
-        }
-    </style>
+    <title>DualMind-Arena</title>
+    
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div class="stats-container">
-        <div class="stat-box">
-            <div class="stat-icon bg-purple">📈</div>
-            <div class="stat-text">
-                <div>Level</div>
-                <span id="level">1</span>
-            </div>
-        </div>
-        <div class="stat-box">
-            <div class="stat-icon bg-green">🏆</div>
-            <div class="stat-text">
-                <div>Score</div>
-                <span id="score">0</span>
-            </div>
-        </div>
-        <div class="stat-box">
-            <div class="stat-icon bg-yellow">⚡</div>
-            <div class="stat-text">
-                <div>Streak</div>
-                <span id="streak">0</span>
-            </div>
-        </div>
+    <audio id="bg-music" src="https://actions.google.com/sounds/v1/ambiences/morning_birds.ogg" loop></audio>
+    <audio id="click-sound" src="https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg"></audio>
+
+    <div id="disconnection-overlay" class="hidden">
+        <h2>Connection Lost!</h2>
+        <p>To prevent cheating, an active internet connection is required.</p>
+        <p>If you were in a match, it may be counted as a loss.</p>
     </div>
 
-    <div class="card">
-        <div class="question">
-            <span id="num1">9</span>
-            <span class="plus-sign">+</span>
-            <span id="num2">9</span>
+    <div id="login-screen" class="game-card">
+        <h1>DualMind-Arena</h1>
+        <p>Enter your name to start the game:</p>
+        <input type="text" id="username-input" placeholder="Player name..." maxlength="12">
+        <button class="btn btn-main" onclick="initPlayer()">Enter Arena</button>
+    </div>
+
+    <div id="main-menu" class="game-card hidden">
+        <h1 id="player-title">Player Dashboard</h1>
+        
+        <div class="stats-box">
+            <div class="stats-item">Level: <span id="stat-level">1</span></div>
+            <div class="stats-item">Total Points: <span id="stat-points">0</span></div>
+            <div class="stats-item">Wins (1v1): <span id="stat-wins">0</span></div>
+            <div class="stats-item">Streak 🔥: <span id="stat-streak">0</span></div>
         </div>
-        
-        <input type="number" id="user-answer" class="answer-input" placeholder="?" inputmode="numeric" pattern="[0-9]*">
-        
-        <button class="submit-btn" onclick="checkAnswer()">Submit</button>
+
+        <button class="btn btn-solo" onclick="selectMode('solo')">Solo Badges (+, -, ×, ÷)</button>
+        <button class="btn btn-mixed" onclick="selectMode('mixed')">Mind Test (Mixed Mode)</button>
+        <button class="btn btn-arena" onclick="selectMode('arena')">🔥 Arena Mode 🔥</button>
+        <button class="btn btn-multi" onclick="selectMode('multiplayer')">1v1 Online Live Match</button>
+        <button class="btn btn-leader" onclick="selectMode('leaderboard')">Monthly Leaderboard (Top 100)</button>
     </div>
 
-    <div class="overlay" id="wrong-overlay" onclick="hideOverlay()">
-        <div class="cross-circle">✕</div>
-        <div class="try-again-text">Try Again!</div>
-    </div>
-
-<script>
-    let num1, num2, correctAnswer;
-    let score = 0;
-    let level = 1;
-    let streak = 0;
-
-    const correctSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-84.wav');
-    const wrongSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2018/2018-84.wav');
-
-    function generateQuestion() {
-        let maxNum = 5 + (level * 5); 
-        num1 = Math.floor(Math.random() * maxNum) + 1;
-        num2 = Math.floor(Math.random() * maxNum) + 1;
-        correctAnswer = num1 + num2;
-        
-        document.getElementById('num1').innerText = num1;
-        document.getElementById('num2').innerText = num2;
-        document.getElementById('user-answer').value = '';
-        document.getElementById('user-answer').focus();
-    }
-
-    function checkAnswer() {
-        const inputField = document.getElementById('user-answer');
-        const userAnswer = parseInt(inputField.value);
-
-        if (isNaN(userAnswer)) return;
-
-        if (userAnswer === correctAnswer) {
-            score++;
-            streak++;
-            document.getElementById('score').innerText = score;
-            document.getElementById('streak').innerText = streak;
-            
-            correctSound.play().catch(e => console.log("Audio blocked"));
-            
-            if (score % 3 === 0) {
-                level++;
-                document.getElementById('level').innerText = level;
-            }
-            generateQuestion();
-        } else {
-            streak = 0;
-            document.getElementById('streak').innerText = streak;
-            
-            wrongSound.play().catch(e => console.log("Audio blocked"));
-            
-            // लाल रंग का स्क्रीन पॉप-अप दिखाना
-            const overlay = document.getElementById('wrong-overlay');
-            overlay.classList.add('show');
-        }
-    }
-
-    function hideOverlay() {
-        document.getElementById('wrong-overlay').classList.remove('show');
-        document.getElementById('user-answer').value = '';
-        document.getElementById('user-answer').focus();
-    }
-
-    // Enter की दबाने पर भी सबमिट हो जाये
-    document.getElementById('user-answer').addEventListener('keyup', function(event) {
-        if (event.key === 'Enter') {
-            checkAnswer();
-        }
-    });
-
-    window.onload = generateQuestion;
-</script>
-
+    <script src="app.js"></script>
 </body>
 </html>
-
