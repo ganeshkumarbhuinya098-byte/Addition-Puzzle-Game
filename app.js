@@ -33,7 +33,7 @@ function initPlayer() {
     
     // Set Player Name
     player.name = nameInput;
-    document.getElementById('player-title').innerText = `${player.name}'s Dashboard`;
+    document.getElementById('player-title').innerText = player.name + "'s Dashboard";
     
     // Hide Login Screen and Show Main Menu
     document.getElementById('login-screen').classList.add('hidden');
@@ -52,7 +52,7 @@ function selectMode(modeName) {
     
     switch(modeName) {
         case 'solo':
-            alert(`Launching Solo Badges (+, -, ×, ÷) for ${player.name}!`);
+            alert("Launching Solo Badges (+, -, ×, ÷) for " + player.name + "!");
             // Solo Mode loading logic will go here
             break;
         case 'mixed':
