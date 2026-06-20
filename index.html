@@ -1,101 +1,139 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Addition Puzzle</title>
-<style>
-body {
-  margin:0;
-  font-family: Arial;
-  background:#6a0dad;
-  color:white;
-  text-align:center;
-}
-#game, #gameOver {
-  padding-top:50px;
-}
-button {
-  padding:15px;
-  margin:10px;
-  font-size:20px;
-  border:none;
-  border-radius:10px;
-}
-.option {
-  background:white;
-  color:black;
-  width:120px;
-}
-#gameOver {
-  display:none;
-  background:red;
-  height:100vh;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Addition Puzzle Game</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f8ff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .game-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+        }
+        h1 {
+            color: #4a90e2;
+            margin-bottom: 20px;
+        }
+        .score-box {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .question {
+            font-size: 32px;
+            font-weight: bold;
+            color: #2c3e50;
+            background-color: #f7f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #e1e8ed;
+        }
+        input[type="number"] {
+            width: 80%;
+            padding: 12px;
+            font-size: 20px;
+            border: 2px solid #bdc3c7;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 20px;
+            outline: none;
+        }
+        input[type="number"]:focus {
+            border-color: #4a90e2;
+        }
+        button {
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 85%;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background-color: #357abd;
+        }
+        .message {
+            margin-top: 15px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .correct { color: #2ecc71; }
+        .wrong { color: #e74c3c; }
+    </style>
 </head>
-
 <body>
 
-<div id="game">
-  <h1>Addition Puzzle</h1>
-  <h2 id="level">Level: 1</h2>
-  <h2 id="question"></h2>
-
-  <div>
-    <button class="option" onclick="check(this)"></button>
-    <button class="option" onclick="check(this)"></button>
-    <button class="option" onclick="check(this)"></button>
-    <button class="option" onclick="check(this)"></button>
-  </div>
-</div>
-
-<div id="gameOver">
-  <h1>Wrong Answer ❌</h1>
-  <button onclick="restart()">Restart</button>
+<div class="game-container">
+    <h1>Addition Puzzle 🧩</h1>
+    <div class="score-box">Score: <span id="score">0</span></div>
+    <div class="question" id="question">0 + 0 = ?</div>
+    <input type="number" id="user-answer" placeholder="Enter your answer" autocomplete="off">
+    <br>
+    <button onclick="checkAnswer()">Check Answer</button>
+    <div class="message" id="message"></div>
 </div>
 
 <script>
-let level = 1;
-let correct = 0;
+    let num1, num2, correctAnswer;
+    let score = 0;
 
-function newQuestion() {
-  let a = Math.floor(Math.random() * level) + 1;
-  let b = Math.floor(Math.random() * level) + 1;
-  correct = a + b;
-
-  document.getElementById("question").innerText = a + " + " + b + " = ?";
-  document.getElementById("level").innerText = "Level: " + level;
-
-  let options = document.getElementsByClassName("option");
-  let correctIndex = Math.floor(Math.random() * 4);
-
-  for (let i = 0; i < 4; i++) {
-    if (i == correctIndex) {
-      options[i].innerText = correct;
-    } else {
-      options[i].innerText = correct + Math.floor(Math.random()*10) - 5;
+    // Function to generate a new question
+    function generateQuestion() {
+        // Random numbers between 1 and 20
+        num1 = Math.floor(Math.random() * 20) + 1;
+        num2 = Math.floor(Math.random() * 20) + 1;
+        correctAnswer = num1 + num2;
+        
+        document.getElementById('question').innerText = `${num1} + ${num2} = ?`;
+        document.getElementById('user-answer').value = '';
+        document.getElementById('message').innerText = '';
     }
-  }
-}
 
-function check(btn) {
-  if (parseInt(btn.innerText) === correct) {
-    level++;
-    newQuestion();
-  } else {
-    document.getElementById("game").style.display = "none";
-    document.getElementById("gameOver").style.display = "block";
-  }
-}
+    // Function to verify the user's answer
+    function checkAnswer() {
+        const userAnswer = parseInt(document.getElementById('user-answer').value);
+        const messageElement = document.getElementById('message');
 
-function restart() {
-  level = 1;
-  document.getElementById("game").style.display = "block";
-  document.getElementById("gameOver").style.display = "none";
-  newQuestion();
-}
+        if (isNaN(userAnswer)) {
+            messageElement.innerText = "Please enter a number first!";
+            messageElement.className = "message wrong";
+            return;
+        }
 
-newQuestion();
+        if (userAnswer === correctAnswer) {
+            score++;
+            document.getElementById('score').innerText = score;
+            messageElement.innerText = "🎉 Correct! Well done!";
+            messageElement.className = "message correct";
+            
+            // Load next question after 1.5 seconds
+            setTimeout(generateQuestion, 1500);
+        } else {
+            messageElement.innerText = `❌ Wrong! The correct answer was ${correctAnswer}.`;
+            messageElement.className = "message wrong";
+        }
+    }
+
+    // Load the first question when the game starts
+    window.onload = generateQuestion;
 </script>
 
 </body>
