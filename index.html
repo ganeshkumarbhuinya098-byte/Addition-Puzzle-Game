@@ -1,176 +1,156 @@
-package com.example.mathgame;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Math Game</title>
 
-import android.graphics.Color;
-import android.os.Bundle;
-import android.view.Gravity;
-import android.view.ViewGroup;
-import android.widget.*;
-import androidx.appcompat.app.AppCompatActivity;
-import java.util.Random;
-
-public class MainActivity extends AppCompatActivity {
-
-    LinearLayout mainLayout, gameLayout, wrongLayout;
-
-    TextView questionText, scoreText, levelText, streakText;
-    EditText answerInput;
-    Button submitBtn, retryBtn;
-
-    int num1, num2;
-    int score = 0;
-    int level = 1;
-    int streak = 0;
-
-    Random random = new Random();
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        mainLayout = new LinearLayout(this);
-        mainLayout.setLayoutParams(new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT));
-
-        // GAME SCREEN
-        gameLayout = new LinearLayout(this);
-        gameLayout.setOrientation(LinearLayout.VERTICAL);
-        gameLayout.setGravity(Gravity.CENTER);
-        gameLayout.setPadding(40, 40, 40, 40);
-        gameLayout.setBackgroundColor(Color.parseColor("#F5F5F5"));
-
-        levelText = new TextView(this);
-        scoreText = new TextView(this);
-        streakText = new TextView(this);
-
-        levelText.setTextSize(18);
-        scoreText.setTextSize(18);
-        streakText.setTextSize(18);
-
-        questionText = new TextView(this);
-        questionText.setTextSize(36);
-        questionText.setGravity(Gravity.CENTER);
-        questionText.setPadding(0, 60, 0, 20);
-
-        answerInput = new EditText(this);
-        answerInput.setHint("Enter Answer");
-        answerInput.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
-        answerInput.setBackgroundColor(Color.WHITE);
-
-        submitBtn = new Button(this);
-        submitBtn.setText("Submit");
-        submitBtn.setBackgroundColor(Color.parseColor("#7B4DFF"));
-        submitBtn.setTextColor(Color.WHITE);
-
-        gameLayout.addView(levelText);
-        gameLayout.addView(scoreText);
-        gameLayout.addView(streakText);
-        gameLayout.addView(questionText);
-        gameLayout.addView(answerInput,
-                new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT));
-        gameLayout.addView(submitBtn);
-
-        // WRONG SCREEN
-        wrongLayout = new LinearLayout(this);
-        wrongLayout.setOrientation(LinearLayout.VERTICAL);
-        wrongLayout.setGravity(Gravity.CENTER);
-        wrongLayout.setBackgroundColor(Color.parseColor("#FF4C4C"));
-
-        TextView wrongIcon = new TextView(this);
-        wrongIcon.setText("❌");
-        wrongIcon.setTextSize(60);
-        wrongIcon.setTextColor(Color.WHITE);
-
-        TextView wrongText = new TextView(this);
-        wrongText.setText("Try Again!");
-        wrongText.setTextSize(28);
-        wrongText.setTextColor(Color.WHITE);
-
-        retryBtn = new Button(this);
-        retryBtn.setText("Restart");
-        retryBtn.setBackgroundColor(Color.WHITE);
-
-        wrongLayout.addView(wrongIcon);
-        wrongLayout.addView(wrongText);
-        wrongLayout.addView(retryBtn);
-
-        mainLayout.addView(gameLayout);
-        mainLayout.addView(wrongLayout);
-
-        setContentView(mainLayout);
-
-        showGame();
-
-        generateQuestion();
-        updateUI();
-
-        submitBtn.setOnClickListener(v -> checkAnswer());
-
-        retryBtn.setOnClickListener(v -> restartGame());
-    }
-
-    void showGame() {
-        gameLayout.setVisibility(LinearLayout.VISIBLE);
-        wrongLayout.setVisibility(LinearLayout.GONE);
-    }
-
-    void showWrongScreen() {
-        gameLayout.setVisibility(LinearLayout.GONE);
-        wrongLayout.setVisibility(LinearLayout.VISIBLE);
-    }
-
-    void restartGame() {
-        score = 0;
-        level = 1;
-        streak = 0;
-
-        showGame();
-        generateQuestion();
-        updateUI();
-    }
-
-    void generateQuestion() {
-        int range = getRangeByLevel();
-        num1 = random.nextInt(range);
-        num2 = random.nextInt(range);
-        questionText.setText(num1 + " + " + num2);
-    }
-
-    int getRangeByLevel() {
-        if (level <= 5) return 10;
-        else if (level <= 10) return 50;
-        else if (level <= 20) return 100;
-        else return 500;
-    }
-
-    void checkAnswer() {
-        String input = answerInput.getText().toString();
-
-        if (input.isEmpty()) {
-            Toast.makeText(this, "Answer डालो", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        int answer = Integer.parseInt(input);
-
-        if (answer == num1 + num2) {
-            score += 10;
-            streak++;
-            level++;
-            Toast.makeText(this, "✅ Correct!", Toast.LENGTH_SHORT).show();
-        } else {
-            showWrongScreen(); // 🔥 MAIN FEATURE
-        }
-
-        updateUI();
-        answerInput.setText("");
-        generateQuestion();
-    }
-
-    void updateUI() {
-        scoreText.setText("Score: " + score);
-        levelText.setText("Level: " + level);
-        streakText.setText("Streak: " + streak);
-    }
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #6a0dad;
+    color: white;
+    text-align: center;
 }
+
+.container {
+    padding: 20px;
+}
+
+h1 {
+    margin-top: 10px;
+}
+
+.stats {
+    margin: 10px 0;
+    font-size: 18px;
+}
+
+.question {
+    font-size: 28px;
+    margin: 20px 0;
+}
+
+input {
+    padding: 10px;
+    font-size: 18px;
+    width: 120px;
+    text-align: center;
+    border: none;
+    border-radius: 8px;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.correct {
+    background: #28a745;
+}
+
+.wrong {
+    background: #dc3545;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>Math Game</h1>
+
+    <div class="stats">
+        Score: <span id="score">0</span> |
+        Level: <span id="level">1</span> |
+        Streak: <span id="streak">0</span>
+    </div>
+
+    <div class="question" id="question">1 + 1</div>
+
+    <input type="number" id="answer" placeholder="Answer">
+    <br>
+    <button onclick="checkAnswer()">Submit</button>
+
+    <br><br>
+    <button onclick="restartGame()">Restart</button>
+</div>
+
+<script>
+let num1, num2;
+let score = 0;
+let level = 1;
+let streak = 0;
+
+function getRange() {
+    if (level <= 5) return 10;
+    if (level <= 10) return 50;
+    if (level <= 20) return 100;
+    return 500;
+}
+
+function generateQuestion() {
+    let range = getRange();
+    num1 = Math.floor(Math.random() * range);
+    num2 = Math.floor(Math.random() * range);
+    document.getElementById("question").innerText = num1 + " + " + num2;
+}
+
+function checkAnswer() {
+    let userAnswer = document.getElementById("answer").value;
+
+    if (userAnswer === "") {
+        alert("Answer डालो भाई 😅");
+        return;
+    }
+
+    userAnswer = parseInt(userAnswer);
+
+    if (userAnswer === num1 + num2) {
+        score += 10;
+        streak++;
+        if (streak % 5 === 0) level++;
+        document.body.style.background = "#28a745";
+    } else {
+        document.body.style.background = "#dc3545";
+        setTimeout(() => {
+            alert("Game Over ❌");
+            restartGame();
+        }, 200);
+        return;
+    }
+
+    updateUI();
+    document.getElementById("answer").value = "";
+    generateQuestion();
+
+    setTimeout(() => {
+        document.body.style.background = "#6a0dad";
+    }, 200);
+}
+
+function updateUI() {
+    document.getElementById("score").innerText = score;
+    document.getElementById("level").innerText = level;
+    document.getElementById("streak").innerText = streak;
+}
+
+function restartGame() {
+    score = 0;
+    level = 1;
+    streak = 0;
+    updateUI();
+    generateQuestion();
+    document.body.style.background = "#6a0dad";
+}
+
+generateQuestion();
+</script>
+
+</body>
+</html>
