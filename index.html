@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Addition Game</title>
+    <title>Math Quiz</title>
     <style>
         * {
             box-sizing: border-box;
@@ -12,218 +12,273 @@
             font-family: 'Arial', sans-serif;
         }
         body {
-            background-color: #f5f6fa;
+            background-color: #fffdf2;
             display: flex;
             flex-direction: column;
             align-items: center;
             height: 100vh;
+            padding: 10px;
+            overflow: hidden;
         }
-        .header {
+        /* टॉप स्टैट्स बार */
+        .stats-container {
             width: 100%;
-            background-color: #4a90e2;
-            color: white;
+            max-width: 420px;
+            background-color: white;
+            border-radius: 20px;
             padding: 15px;
             display: flex;
-            justify-content: space-between;
+            justify-content: space-around;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+        .stat-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
             align-items: center;
             font-size: 20px;
+        }
+        .bg-purple { background-color: #f1ecf7; color: #8e44ad; }
+        .bg-green { background-color: #e8f8f5; color: #1abc9c; }
+        .bg-yellow { background-color: #fef9e7; color: #f39c12; }
+        
+        .stat-text div {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #7f8c8d;
             font-weight: bold;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            letter-spacing: 0.5px;
         }
-        .header .btn {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 22px;
-            cursor: pointer;
-        }
-        .stats-bar {
-            width: 90%;
-            max-width: 400px;
-            display: flex;
-            justify-content: space-between;
-            margin: 20px 0 10px 0;
-            font-size: 18px;
+        .stat-text span {
+            font-size: 20px;
             font-weight: bold;
-            color: #333;
-            padding: 0 5px;
+            color: #2c3e50;
         }
-        .game-container {
-            width: 90%;
-            max-width: 400px;
+
+        /* मुख्य गेम कार्ड */
+        .card {
+            background: white;
+            width: 100%;
+            max-width: 420px;
+            border: 4px solid #1a233d;
+            border-radius: 40px;
+            padding: 40px 25px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            flex-grow: 1;
-            justify-content: center;
-            padding-bottom: 50px;
+            box-shadow: 0 10px 0px #1a233d;
+            position: relative;
         }
-        .question-box {
-            background-color: #ffffff;
-            width: 100%;
-            padding: 35px 20px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            text-align: center;
-            font-size: 36px;
-            font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 30px;
-            border: 1px solid #e1e8ed;
-        }
-        .options-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+        .question {
+            font-size: 65px;
+            font-weight: 900;
+            color: #1a233d;
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
             gap: 15px;
+        }
+        .plus-sign {
+            color: #70a1ff;
+        }
+        
+        /* इनपुट बॉक्स */
+        .answer-input {
             width: 100%;
-            margin-bottom: 25px;
-        }
-        .option-btn {
-            background-color: #ffffff;
-            border: 2px solid #e1e8ed;
-            padding: 18px;
-            font-size: 22px;
+            border: 4px solid #9b59b6;
+            border-radius: 20px;
+            padding: 20px;
+            font-size: 40px;
             font-weight: bold;
-            color: #2c3e50;
-            border-radius: 12px;
-            cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-            transition: all 0.2s ease;
-        }
-        .option-btn:active {
-            transform: scale(0.95);
-        }
-        .message {
-            font-size: 24px;
-            font-weight: bold;
-            height: 35px;
-            margin-top: 10px;
             text-align: center;
+            color: #1a233d;
+            outline: none;
+            margin-bottom: 25px;
+            background-color: transparent;
         }
-        .correct-msg { color: #2ecc71; }
-        .wrong-msg { color: #e74c3c; }
+        .answer-input::placeholder {
+            color: #1a233d;
+        }
+
+        /* सबमिट बटन */
+        .submit-btn {
+            width: 100%;
+            background-color: #7d5fff;
+            color: white;
+            font-size: 26px;
+            font-weight: bold;
+            padding: 18px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 0 6px 0px #4b2ccb;
+            transition: all 0.1s;
+        }
+        .submit-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0px #4b2ccb;
+        }
+
+        /* गलत होने पर फुल स्क्रीन रेड पॉप-अप */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #ff5252;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .cross-circle {
+            width: 120px;
+            height: 120px;
+            border: 8px solid white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 60px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .try-again-text {
+            color: white;
+            font-size: 45px;
+            font-weight: 900;
+        }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <button class="btn" onclick="window.history.back()">⬅</button>
-        <span>Addition Game</span>
-        <button class="btn" onclick="restartGame()">🔄</button>
-    </div>
-
-    <div class="stats-bar">
-        <div>Level: <span id="level">1</span></div>
-        <div>Score: <span id="score">0</span></div>
-    </div>
-
-    <div class="game-container">
-        <div class="question-box" id="question">0 + 0 = ?</div>
-        
-        <div class="options-grid">
-            <button class="option-btn" onclick="checkAnswer(this)"></button>
-            <button class="option-btn" onclick="checkAnswer(this)"></button>
-            <button class="option-btn" onclick="checkAnswer(this)"></button>
-            <button class="option-btn" onclick="checkAnswer(this)"></button>
+    <div class="stats-container">
+        <div class="stat-box">
+            <div class="stat-icon bg-purple">📈</div>
+            <div class="stat-text">
+                <div>Level</div>
+                <span id="level">1</span>
+            </div>
         </div>
+        <div class="stat-box">
+            <div class="stat-icon bg-green">🏆</div>
+            <div class="stat-text">
+                <div>Score</div>
+                <span id="score">0</span>
+            </div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-icon bg-yellow">⚡</div>
+            <div class="stat-text">
+                <div>Streak</div>
+                <span id="streak">0</span>
+            </div>
+        </div>
+    </div>
 
-        <div class="message" id="message"></div>
+    <div class="card">
+        <div class="question">
+            <span id="num1">9</span>
+            <span class="plus-sign">+</span>
+            <span id="num2">9</span>
+        </div>
+        
+        <input type="number" id="user-answer" class="answer-input" placeholder="?" inputmode="numeric" pattern="[0-9]*">
+        
+        <button class="submit-btn" onclick="checkAnswer()">Submit</button>
+    </div>
+
+    <div class="overlay" id="wrong-overlay" onclick="hideOverlay()">
+        <div class="cross-circle">✕</div>
+        <div class="try-again-text">Try Again!</div>
     </div>
 
 <script>
     let num1, num2, correctAnswer;
     let score = 0;
     let level = 1;
+    let streak = 0;
 
-    // Free online audio assets
     const correctSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-84.wav');
     const wrongSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2018/2018-84.wav');
 
     function generateQuestion() {
-        let maxNum = 10 + (level * 5); 
+        let maxNum = 5 + (level * 5); 
         num1 = Math.floor(Math.random() * maxNum) + 1;
         num2 = Math.floor(Math.random() * maxNum) + 1;
         correctAnswer = num1 + num2;
         
-        document.getElementById('question').innerText = `${num1} + ${num2} = ?`;
-        document.getElementById('message').innerText = '';
-        
-        setupOptions();
+        document.getElementById('num1').innerText = num1;
+        document.getElementById('num2').innerText = num2;
+        document.getElementById('user-answer').value = '';
+        document.getElementById('user-answer').focus();
     }
 
-    function setupOptions() {
-        let options = [correctAnswer];
-        
-        while(options.length < 4) {
-            let wrongAns = correctAnswer + Math.floor(Math.random() * 10) - 5;
-            if(wrongAns !== correctAnswer && wrongAns > 0 && !options.includes(wrongAns)) {
-                options.push(wrongAns);
-            }
-        }
-        
-        options.sort(() => Math.random() - 0.5);
-        
-        const buttons = document.querySelectorAll('.option-btn');
-        buttons.forEach((btn, index) => {
-            btn.innerText = options[index];
-            btn.style.backgroundColor = "#ffffff";
-            btn.style.color = "#2c3e50";
-            btn.disabled = false;
-        });
-    }
+    function checkAnswer() {
+        const inputField = document.getElementById('user-answer');
+        const userAnswer = parseInt(inputField.value);
 
-    function checkAnswer(selectedButton) {
-        const userAnswer = parseInt(selectedButton.innerText);
-        const messageElement = document.getElementById('message');
-        const buttons = document.querySelectorAll('.option-btn');
-        
-        buttons.forEach(btn => btn.disabled = true);
+        if (isNaN(userAnswer)) return;
 
         if (userAnswer === correctAnswer) {
             score++;
+            streak++;
             document.getElementById('score').innerText = score;
-            messageElement.innerText = "Excellent! 🎉";
-            messageElement.className = "message correct-msg";
-            selectedButton.style.backgroundColor = "#2ecc71";
-            selectedButton.style.color = "white";
+            document.getElementById('streak').innerText = streak;
             
             correctSound.play().catch(e => console.log("Audio blocked"));
             
-            if(score % 3 === 0) {
+            if (score % 3 === 0) {
                 level++;
                 document.getElementById('level').innerText = level;
             }
-            
-            setTimeout(generateQuestion, 1500);
+            generateQuestion();
         } else {
-            messageElement.innerText = "Wrong! ❌";
-            messageElement.className = "message wrong-msg";
-            selectedButton.style.backgroundColor = "#e74c3c";
-            selectedButton.style.color = "white";
+            streak = 0;
+            document.getElementById('streak').innerText = streak;
             
-            buttons.forEach(btn => {
-                if(parseInt(btn.innerText) === correctAnswer) {
-                    btn.style.backgroundColor = "#2ecc71";
-                    btn.style.color = "white";
-                }
-            });
-
             wrongSound.play().catch(e => console.log("Audio blocked"));
             
-            setTimeout(generateQuestion, 2000);
+            // लाल रंग का स्क्रीन पॉप-अप दिखाना
+            const overlay = document.getElementById('wrong-overlay');
+            overlay.classList.add('show');
         }
     }
 
-    function restartGame() {
-        score = 0;
-        level = 1;
-        document.getElementById('score').innerText = score;
-        document.getElementById('level').innerText = level;
-        generateQuestion();
+    function hideOverlay() {
+        document.getElementById('wrong-overlay').classList.remove('show');
+        document.getElementById('user-answer').value = '';
+        document.getElementById('user-answer').focus();
     }
+
+    // Enter की दबाने पर भी सबमिट हो जाये
+    document.getElementById('user-answer').addEventListener('keyup', function(event) {
+        if (event.key === 'Enter') {
+            checkAnswer();
+        }
+    });
 
     window.onload = generateQuestion;
 </script>
 
 </body>
 </html>
+
