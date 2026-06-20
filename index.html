@@ -1,0 +1,176 @@
+package com.example.mathgame;
+
+import android.graphics.Color;
+import android.os.Bundle;
+import android.view.Gravity;
+import android.view.ViewGroup;
+import android.widget.*;
+import androidx.appcompat.app.AppCompatActivity;
+import java.util.Random;
+
+public class MainActivity extends AppCompatActivity {
+
+    LinearLayout mainLayout, gameLayout, wrongLayout;
+
+    TextView questionText, scoreText, levelText, streakText;
+    EditText answerInput;
+    Button submitBtn, retryBtn;
+
+    int num1, num2;
+    int score = 0;
+    int level = 1;
+    int streak = 0;
+
+    Random random = new Random();
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        mainLayout = new LinearLayout(this);
+        mainLayout.setLayoutParams(new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT));
+
+        // GAME SCREEN
+        gameLayout = new LinearLayout(this);
+        gameLayout.setOrientation(LinearLayout.VERTICAL);
+        gameLayout.setGravity(Gravity.CENTER);
+        gameLayout.setPadding(40, 40, 40, 40);
+        gameLayout.setBackgroundColor(Color.parseColor("#F5F5F5"));
+
+        levelText = new TextView(this);
+        scoreText = new TextView(this);
+        streakText = new TextView(this);
+
+        levelText.setTextSize(18);
+        scoreText.setTextSize(18);
+        streakText.setTextSize(18);
+
+        questionText = new TextView(this);
+        questionText.setTextSize(36);
+        questionText.setGravity(Gravity.CENTER);
+        questionText.setPadding(0, 60, 0, 20);
+
+        answerInput = new EditText(this);
+        answerInput.setHint("Enter Answer");
+        answerInput.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+        answerInput.setBackgroundColor(Color.WHITE);
+
+        submitBtn = new Button(this);
+        submitBtn.setText("Submit");
+        submitBtn.setBackgroundColor(Color.parseColor("#7B4DFF"));
+        submitBtn.setTextColor(Color.WHITE);
+
+        gameLayout.addView(levelText);
+        gameLayout.addView(scoreText);
+        gameLayout.addView(streakText);
+        gameLayout.addView(questionText);
+        gameLayout.addView(answerInput,
+                new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT));
+        gameLayout.addView(submitBtn);
+
+        // WRONG SCREEN
+        wrongLayout = new LinearLayout(this);
+        wrongLayout.setOrientation(LinearLayout.VERTICAL);
+        wrongLayout.setGravity(Gravity.CENTER);
+        wrongLayout.setBackgroundColor(Color.parseColor("#FF4C4C"));
+
+        TextView wrongIcon = new TextView(this);
+        wrongIcon.setText("❌");
+        wrongIcon.setTextSize(60);
+        wrongIcon.setTextColor(Color.WHITE);
+
+        TextView wrongText = new TextView(this);
+        wrongText.setText("Try Again!");
+        wrongText.setTextSize(28);
+        wrongText.setTextColor(Color.WHITE);
+
+        retryBtn = new Button(this);
+        retryBtn.setText("Restart");
+        retryBtn.setBackgroundColor(Color.WHITE);
+
+        wrongLayout.addView(wrongIcon);
+        wrongLayout.addView(wrongText);
+        wrongLayout.addView(retryBtn);
+
+        mainLayout.addView(gameLayout);
+        mainLayout.addView(wrongLayout);
+
+        setContentView(mainLayout);
+
+        showGame();
+
+        generateQuestion();
+        updateUI();
+
+        submitBtn.setOnClickListener(v -> checkAnswer());
+
+        retryBtn.setOnClickListener(v -> restartGame());
+    }
+
+    void showGame() {
+        gameLayout.setVisibility(LinearLayout.VISIBLE);
+        wrongLayout.setVisibility(LinearLayout.GONE);
+    }
+
+    void showWrongScreen() {
+        gameLayout.setVisibility(LinearLayout.GONE);
+        wrongLayout.setVisibility(LinearLayout.VISIBLE);
+    }
+
+    void restartGame() {
+        score = 0;
+        level = 1;
+        streak = 0;
+
+        showGame();
+        generateQuestion();
+        updateUI();
+    }
+
+    void generateQuestion() {
+        int range = getRangeByLevel();
+        num1 = random.nextInt(range);
+        num2 = random.nextInt(range);
+        questionText.setText(num1 + " + " + num2);
+    }
+
+    int getRangeByLevel() {
+        if (level <= 5) return 10;
+        else if (level <= 10) return 50;
+        else if (level <= 20) return 100;
+        else return 500;
+    }
+
+    void checkAnswer() {
+        String input = answerInput.getText().toString();
+
+        if (input.isEmpty()) {
+            Toast.makeText(this, "Answer डालो", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        int answer = Integer.parseInt(input);
+
+        if (answer == num1 + num2) {
+            score += 10;
+            streak++;
+            level++;
+            Toast.makeText(this, "✅ Correct!", Toast.LENGTH_SHORT).show();
+        } else {
+            showWrongScreen(); // 🔥 MAIN FEATURE
+        }
+
+        updateUI();
+        answerInput.setText("");
+        generateQuestion();
+    }
+
+    void updateUI() {
+        scoreText.setText("Score: " + score);
+        levelText.setText("Level: " + level);
+        streakText.setText("Streak: " + streak);
+    }
+}
