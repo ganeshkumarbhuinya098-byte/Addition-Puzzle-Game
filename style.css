@@ -1,132 +1,161 @@
-/* DualMind-Arena - Global Theme Styles */
 * {
-    box-sizing: border-box;
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
-    background-color: #0d1117; /* Dark Tech Background */
-    color: #c9d1d9;
-    display: block;
+    background-color: #0b0c10;
+    color: #c5c6c7;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     min-height: 100vh;
-    padding: 20px 15px;
-    text-align: center;
+    overflow: hidden;
 }
 
-/* Hidden Class Helper */
+.container {
+    background: #1f2833;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+    border: 2px solid #45f3ff;
+    width: 90%;
+    max-width: 450px;
+    text-align: center;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+/* छुपाने के लिए क्लास */
 .hidden {
     display: none !important;
 }
 
-/* Central Game Card Layout */
-.game-card {
-    background: #161b22;
-    border: 2px solid #30363d;
-    border-radius: 12px;
-    max-width: 480px;
-    margin: 40px auto;
-    padding: 30px 20px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+/* साउंड सेटिंग का कोना */
+.settings-corner {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,0,0,0.3);
+    padding: 5px 10px;
+    border-radius: 20px;
 }
 
-h1 {
-    color: #58a6ff; /* Neon Blue Accent */
-    font-size: 24pt;
-    margin-bottom: 15px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+.vol-icon {
+    font-size: 16px;
 }
 
-p {
-    font-size: 11pt;
-    color: #8b949e;
-    margin-bottom: 20px;
-}
-
-/* Input Fields */
-input[type="text"] {
-    width: 100%;
-    padding: 12px;
-    background-color: #0d1117;
-    border: 2px solid #30363d;
-    border-radius: 6px;
-    color: #ffffff;
-    font-size: 12pt;
-    margin-bottom: 20px;
-    text-align: center;
-    outline: none;
-}
-
-input[type="text"]:focus {
-    border-color: #58a6ff;
-}
-
-/* Button System */
-.btn {
-    width: 100%;
-    padding: 14px;
-    margin-bottom: 12px;
-    border: none;
-    border-radius: 8px;
-    font-size: 11pt;
-    font-weight: bold;
+#volume-slider {
+    width: 60px;
     cursor: pointer;
-    color: #ffffff;
-    transition: transform 0.1s, filter 0.2s;
+    accent-color: #45f3ff;
 }
 
-.btn:active {
-    transform: scale(0.98);
+/* हैडर स्टाइल */
+.header h1 {
+    color: #fff;
+    font-size: 2.2rem;
+    letter-spacing: 2px;
+    margin-bottom: 5px;
 }
 
-.btn-main { background-color: #238636; } /* Green */
-.btn-solo { background-color: #1f6feb; } /* Blue */
-.btn-mixed { background-color: #8957e5; } /* Purple */
-.btn-arena { background-color: #da3633; } /* Red */
-.btn-multi { background-color: #d29922; } /* Orange/Gold */
-.btn-leader { background-color: #21262d; border: 1px solid #30363d; }
+.header h1 span {
+    color: #45f3ff;
+}
 
-/* Player Stats Panel */
-.stats-box {
-    background-color: #0d1117;
-    border: 1px solid #30363d;
-    border-radius: 8px;
+.header p {
+    color: #66fcf1;
+    font-size: 1rem;
+    margin-bottom: 30px;
+}
+
+/* बटन स्टाइल */
+.mode-selection {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.mode-btn {
+    background: #0b0c10;
+    color: #fff;
+    border: 1px solid #66fcf1;
     padding: 15px;
-    margin-bottom: 25px;
-    display: table;
-    width: 100%;
+    font-size: 1.1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: 0.2s;
 }
 
-.stats-item {
-    display: table-row;
-    text-align: left;
-    font-size: 11pt;
-    line-height: 2.2;
+.mode-btn:hover {
+    background: #66fcf1;
+    color: #0b0c10;
+    box-shadow: 0 0 15px #66fcf1;
+    transform: scale(1.02);
 }
 
-.stats-item span {
-    float: right;
+/* जोड़ वाला सेशन बॉक्स स्टाइल */
+.session-card {
+    padding: 10px;
+}
+
+.session-icon {
+    font-size: 4rem;
+    color: #45f3ff;
+    margin-bottom: 15px;
+    animation: pulse 2s infinite;
+}
+
+.session-card h2 {
+    color: #fff;
+    font-size: 2rem;
+    margin-bottom: 5px;
+}
+
+.session-subtitle {
+    color: #66fcf1;
+    font-size: 1rem;
+    margin-bottom: 20px;
+}
+
+.session-desc {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: #c5c6c7;
+    margin-bottom: 30px;
+}
+
+/* स्टार्ट बटन */
+.start-btn {
+    background: #45f3ff;
+    color: #0b0c10;
+    border: none;
+    padding: 15px 40px;
+    font-size: 1.2rem;
     font-weight: bold;
-    color: #58a6ff;
+    border-radius: 30px;
+    cursor: pointer;
+    box-shadow: 0 0 15px rgba(69, 243, 255, 0.4);
+    transition: 0.2s;
 }
 
-/* Connection Overlay Screen */
-#disconnection-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(13, 17, 23, 0.95);
-    z-index: 9999;
-    display: block;
-    padding-top: 30vh;
+.start-btn:hover {
+    background: #fff;
+    box-shadow: 0 0 25px #45f3ff;
+    transform: scale(1.05);
 }
 
-#disconnection-overlay h2 {
-    color: #f85149;
-    font-size: 20pt;
-    margin-bottom: 10px;
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); opacity: 0.8; }
+    100% { transform: scale(1); }
 }
