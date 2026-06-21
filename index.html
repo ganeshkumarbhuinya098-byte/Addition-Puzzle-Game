@@ -3,45 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DualMind-Arena</title>
-    
+    <title>Math Arena - Gaming Edition</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <audio id="bg-music" src="https://actions.google.com/sounds/v1/ambiences/morning_birds.ogg" loop></audio>
-    <audio id="click-sound" src="https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg"></audio>
-
-    <div id="disconnection-overlay" class="hidden">
-        <h2>Connection Lost!</h2>
-        <p>To prevent cheating, an active internet connection is required.</p>
-        <p>If you were in a match, it may be counted as a loss.</p>
-    </div>
-
-    <div id="login-screen" class="game-card">
-        <h1>DualMind-Arena</h1>
-        <p>Enter your name to start the game:</p>
-        <input type="text" id="username-input" placeholder="Player name..." maxlength="12">
-        <button class="btn btn-main" onclick="initPlayer()">Enter Arena</button>
-    </div>
-
-    <div id="main-menu" class="game-card hidden">
-        <h1 id="player-title">Player Dashboard</h1>
-        
-        <div class="stats-box">
-            <div class="stats-item">Level: <span id="stat-level">1</span></div>
-            <div class="stats-item">Total Points: <span id="stat-points">0</span></div>
-            <div class="stats-item">Wins (1v1): <span id="stat-wins">0</span></div>
-            <div class="stats-item">Streak 🔥: <span id="stat-streak">0</span></div>
+    <div id="dashboard" class="container">
+        <div class="settings-corner">
+            <span class="vol-icon">🔊</span>
+            <input type="range" id="volume-slider" min="0" max="100" value="50">
         </div>
 
-        <button class="btn btn-solo" onclick="selectMode('solo')">Solo Badges (+, -, ×, ÷)</button>
-        <button class="btn btn-mixed" onclick="selectMode('mixed')">Mind Test (Mixed Mode)</button>
-        <button class="btn btn-arena" onclick="selectMode('arena')">🔥 Arena Mode 🔥</button>
-        <button class="btn btn-multi" onclick="selectMode('multiplayer')">1v1 Online Live Match</button>
-        <button class="btn btn-leader" onclick="selectMode('leaderboard')">Monthly Leaderboard (Top 100)</button>
+        <div class="header">
+            <h1>MATH <span>ARENA</span></h1>
+            <p>Welcome, Player 1</p>
+        </div>
+
+        <div class="mode-selection">
+            <button class="mode-btn solo" id="solo-badges-btn">
+                <span class="btn-icon">🎖️</span> Solo Badges
+            </button>
+            <button class="mode-btn arena" id="enter-arena-btn">
+                <span class="btn-icon">⚔️</span> Enter Arena
+            </button>
+        </div>
     </div>
 
-    <script src="app.js"></script>
+    <div id="game-screen" class="container hidden">
+        <div class="session-card">
+            <div class="session-icon">➕</div>
+            <h2>जोड़ वाला सेशन</h2>
+            <p class="session-subtitle">(Addition Challenge)</p>
+            <p class="session-desc">क्या आप गणित के इस महायुद्ध के लिए तैयार हैं? अपनी उंगलियां तैयार रखिए!</p>
+            
+            <button id="start-game-btn" class="start-btn">START GAME</button>
+        </div>
+    </div>
+
+    <audio id="bg-music" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" loop></audio>
+    <audio id="click-sound" src="https://actions.google.com/sounds/v1/ui/click.ogg"></audio>
+
 </body>
 </html>
