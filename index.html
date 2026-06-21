@@ -1,374 +1,543 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Math Arena - Ultimate Edition</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Addition Puzzle Game</title>
     <style>
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            user-select: none;
-            touch-action: manipulation;
         }
 
         body {
-            background-color: #fff9e6;
+            background-color: #F9F9F6;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            overflow: hidden;
-            padding: 20px;
+            color: #333;
         }
 
-        .screen-wrapper {
+        .game-container {
             width: 100%;
-            max-width: 380px;
+            max-width: 400px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* Top Stats Bar */
+        .stats-bar {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            background: #FFF;
+            padding: 12px 15px;
+            border-radius: 16px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            border: 2px solid #EAEAEA;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        /* Top Leaderboard Streak Display */
+        .top-streak-banner {
+            font-size: 13px;
+            color: #666;
+            font-weight: 600;
+            background: #EAEAEA;
+            padding: 4px 12px;
+            border-radius: 20px;
+            margin-bottom: -5px;
+        }
+
+        /* Main Puzzle Box (Video Style) */
+        .puzzle-box {
+            width: 100%;
+            background: #FFF;
+            border: 3px solid #111;
+            border-radius: 24px;
+            padding: 30px 20px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 8px 0 #111;
+            background-image: radial-gradient(#E0E0E0 1.5px, transparent 1.5px);
+            background-size: 15px 15px;
+        }
+
+        .question {
+            font-size: 42px;
+            font-weight: 800;
+            color: #111;
+            letter-spacing: 2px;
+        }
+
+        .question span {
+            color: #4A3AFF;
+        }
+
+        .input-box {
+            width: 85%;
+            height: 65px;
+            border: 3px solid #111;
+            border-radius: 16px;
+            text-align: center;
+            font-size: 32px;
+            font-weight: 700;
+            color: #111;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .input-box::placeholder {
+            color: #AAA;
+        }
+
+        .submit-btn {
+            width: 85%;
+            height: 55px;
+            background: #7F56D9;
+            color: white;
+            border: 3px solid #111;
+            border-radius: 16px;
+            font-size: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #111;
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+
+        .submit-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 0px 0 #111;
+        }
+
+        /* Bottom Controls */
+        .control-btns {
+            width: 100%;
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #111;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            background: #FFF;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #111;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .action-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 0px 0 #111;
+        }
+
+        /* Feedback Overlay (Burst Animation) */
+        .feedback-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 21px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            display: none;
+        }
+
+        .feedback-overlay.correct {
+            background: #2EC4B6;
+            color: white;
+            animation: burst 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        .feedback-overlay.wrong {
+            background: #FF3366;
+            color: white;
+            animation: shake 0.3s ease-in-out;
+        }
+
+        .feedback-icon {
+            font-size: 60px;
+            margin-bottom: 10px;
+        }
+
+        .feedback-text {
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        /* Switch Mode Modal (Pop-up Menus) */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            visibility: hidden;
+            opacity: 0;
+            transition: all 0.2s ease;
+        }
+
+        .modal.active {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: white;
+            border: 3px solid #111;
+            border-radius: 24px;
+            padding: 25px;
+            width: 90%;
+            max-width: 340px;
+            box-shadow: 0 8px 0 #111;
             display: flex;
             flex-direction: column;
             gap: 15px;
-            align-items: center;
         }
 
-        /* Name Overlay Screen */
-        .overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #fff9e6;
-            z-index: 100;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 30px;
-        }
-
-        .overlay-card {
-            background: #ffffff;
-            border: 4px solid #11142a;
-            box-shadow: 0 10px 0px #11142a;
-            border-radius: 28px;
-            padding: 30px 20px;
-            width: 100%;
-            max-width: 340px;
+        .modal-title {
+            font-size: 18px;
+            font-weight: 800;
             text-align: center;
+            margin-bottom: 5px;
         }
 
-        .overlay-title { font-size: 1.8rem; font-weight: 900; color: #11142a; margin-bottom: 15px; }
-        
-        .global-input {
+        .menu-btn {
             width: 100%;
-            padding: 14px;
-            font-size: 1.2rem;
-            border: 3px solid #11142a;
-            border-radius: 16px;
-            outline: none;
-            text-align: center;
+            padding: 12px;
+            font-size: 15px;
             font-weight: 700;
-            margin-bottom: 20px;
+            border: 2px solid #111;
+            border-radius: 12px;
+            background: #FFF;
+            cursor: pointer;
+            text-align: left;
         }
 
-        /* Stats & Header */
-        .stats-bar {
-            background: #ffffff;
-            width: 100%;
-            padding: 12px 16px;
-            border-radius: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 6px 0px rgba(0, 0, 0, 0.05);
-            border: 2px solid #11142a;
+        .menu-btn.active-mode {
+            background: #E6E2FF;
+            border-color: #4A3AFF;
         }
 
-        .stat-item { display: flex; align-items: center; gap: 6px; }
-        .stat-icon { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
-        .icon-purple { background: #f3e8ff; color: #7c3aed; }
-        .icon-green { background: #dcfce7; color: #16a34a; }
-        .icon-orange { background: #ffedd5; color: #ea580c; }
-        .stat-text { display: flex; flex-direction: column; }
-        .stat-label { font-size: 0.6rem; text-transform: uppercase; font-weight: 800; color: #6b7280; }
-        .stat-value { font-size: 1rem; font-weight: 900; color: #11142a; }
-
-        /* Game Card Setup */
-        .card-container { width: 100%; height: 380px; position: relative; }
-        
-        .game-card {
-            background-color: #ffffff;
-            background-image: radial-gradient(#e5e7eb 1.5px, transparent 1.5px), radial-gradient(#e5e7eb 1.5px, #ffffff 1.5px);
-            background-size: 24px 24px;
-            background-position: 0 0, 12px 12px;
-            width: 100%; height: 100%;
-            border-radius: 32px;
-            border: 4px solid #11142a;
-            box-shadow: 0 10px 0px #11142a;
-            padding: 24px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            overflow: hidden;
-            position: relative;
+        .menu-btn:hover {
+            background: #F5F5F5;
         }
 
-        .game-card.correct-state { background: #1db97e !important; background-image: none !important; }
-        .game-card.wrong-state { background: #e65353 !important; background-image: none !important; }
-
-        .flash-content {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%; width: 100%; gap: 15px;
+        .menu-btn.active-mode:hover {
+            background: #E6E2FF;
         }
 
-        /* Accurate Zoom Burst Animations */
-        @keyframes zoomBurstSuccess {
-            0% { transform: scale(0); opacity: 0; }
-            70% { transform: scale(1.15); }
+        .divider {
+            height: 2px;
+            background: #EAEAEA;
+            margin: 5px 0;
+        }
+
+        /* Animations */
+        @keyframes burst {
+            0% { transform: scale(0.6); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
         }
 
-        @keyframes zoomBurstFail {
-            0% { transform: scale(0); opacity: 0; }
-            60% { transform: scale(1.1); }
-            70% { transform: translateX(-8px) scale(1); }
-            80% { transform: translateX(8px); }
-            90% { transform: translateX(-4px); }
-            100% { transform: translateX(0); opacity: 1; }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-10px); }
+            40%, 80% { transform: translateX(10px); }
         }
-
-        .animate-zoom-success { animation: zoomBurstSuccess 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.2) both; }
-        .animate-zoom-fail { animation: zoomBurstFail 0.5s ease window both; }
-
-        .flash-icon {
-            width: 90px; height: 90px; border-radius: 50%; border: 6px solid #ffffff;
-            display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: bold; color: #ffffff;
-        }
-
-        .flash-text { font-size: 2rem; font-weight: 900; color: #ffffff; }
-
-        .question-text { font-size: 3.5rem; font-weight: 900; color: #11142a; text-align: center; }
-        .mode-tag { background: #f1f5f9; padding: 4px 12px; border-radius: 12px; font-size: 0.75rem; font-weight: 800; color: #475569; border: 1.5px solid #11142a; }
-
-        /* Buttons & Controls */
-        .action-button {
-            background: #7c3aed; color: #ffffff; border: 3px solid #11142a;
-            padding: 12px; font-size: 1.2rem; font-weight: 900; border-radius: 16px;
-            cursor: pointer; width: 100%; max-width: 260px; box-shadow: 0 5px 0px #11142a; transition: 0.1s;
-        }
-        .action-button:active { transform: translateY(3px); box-shadow: 0 2px 0px #11142a; }
-
-        .bottom-controls { display: flex; gap: 10px; width: 100%; justify-content: center; }
-
-        .pill-btn {
-            background: #ffffff; color: #11142a; border: 2px solid #cbd5e1;
-            padding: 10px 18px; font-size: 0.85rem; font-weight: 800; border-radius: 20px;
-            cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 3px 0px #cbd5e1;
-        }
-        .pill-btn:active { transform: translateY(2px); box-shadow: 0 1px 0px #cbd5e1; }
-
-        .leaderboard-banner { font-size: 0.8rem; font-weight: 800; color: #475569; background: #ffffff; padding: 6px 14px; border-radius: 12px; border: 2px solid #11142a; width: 100%; text-align: center; }
-
-        .flex { display: flex !important; }
-        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <div class="overlay" id="name-overlay">
-        <div class="overlay-card">
-            <div class="overlay-title">Enter Your Arena Name</div>
-            <input type="text" id="player-name-input" class="global-input" placeholder="Your Name..." maxlength="12">
-            <button class="action-button" id="save-name-btn">Battle Start</button>
-        </div>
-    </div>
-
-    <div class="screen-wrapper">
-        <div class="leaderboard-banner" id="top-rank-banner">🏆 Monthly #1: Checking...</div>
-
+    <div class="game-container">
         <div class="stats-bar">
-            <div class="stat-item"><div class="stat-icon icon-purple">📈</div><div class="stat-text"><span class="stat-label">Level</span><span id="level-val" class="stat-value">1</span></div></div>
-            <div class="stat-item"><div class="stat-icon icon-green">🏆</div><div class="stat-text"><span class="stat-label">Score</span><span id="score-val" class="stat-value">0</span></div></div>
-            <div class="stat-item"><div class="stat-icon icon-orange">⚡</div><div class="stat-text"><span class="stat-label">Streak</span><span id="streak-val" class="stat-value">0</span></div></div>
+            <div class="stat-item" style="color: #4A3AFF;">📈 LEVEL: <span id="level-val">1</span></div>
+            <div class="stat-item" style="color: #2EC4B6;">🏆 SCORE: <span id="score-val">0</span></div>
+            <div class="stat-item" style="color: #FF9F1C;">⚡ STREAK: <span id="streak-val">0</span></div>
         </div>
 
-        <div class="card-container">
-            <div class="game-card" id="interactive-card">
-                
-                <div class="flash-content flex" id="main-play-content">
-                    <span class="mode-tag" id="current-mode-tag">Infinite Addition</span>
-                    <div class="question-text" id="display-question">0 + 0</div>
-                    <div style="width: 100%; max-width: 260px;">
-                        <input type="number" id="answer-input" class="global-input" style="margin-bottom:0;" placeholder="?" inputmode="numeric">
-                    </div>
-                    <button class="action-button" id="submit-answer-btn">Submit</button>
-                </div>
+        <div class="top-streak-banner">👑 High Streak Record: <span id="high-streak-val">0</span></div>
 
-                <div class="flash-content" id="multiplayer-searching">
-                    <div class="question-text" style="font-size:1.8rem;">Searching Opponent...</div>
-                    <div class="mode-tag">Global Arena 1v1</div>
-                </div>
+        <div class="puzzle-box">
+            <div class="question" id="question-text">6 <span>+</span> 5</div>
+            <input type="number" class="input-box" id="answer-input" placeholder="?" inputmode="numeric">
+            <button class="submit-btn" id="submit-btn">Submit</button>
 
-                <div class="flash-content" id="correct-flash-content">
-                    <div class="flash-icon">✓</div>
-                    <div class="flash-text">Awesome!</div>
-                </div>
-
-                <div class="flash-content" id="wrong-flash-content">
-                    <div class="flash-icon">✕</div>
-                    <div class="flash-text">Try Again!</div>
-                </div>
-
+            <div class="feedback-overlay" id="feedback-overlay">
+                <div class="feedback-icon" id="feedback-icon">✓</div>
+                <div class="feedback-text" id="feedback-text">Awesome!</div>
             </div>
         </div>
 
-        <div class="bottom-controls">
-            <button class="pill-btn" id="switch-mode-trigger">🔄 Switch Mode</button>
-            <button class="pill-btn" id="new-game-trigger" style="border-color:#ea580c; color:#ea580c; box-shadow:0 3px 0px #ffedd5;">🆕 New Game</button>
+        <div class="control-btns">
+            <button class="action-btn" id="switch-btn">⚙ Switch Mode</button>
+            <button class="action-btn" id="new-game-btn" style="background: #FFF5F5;">🔄 New Game</button>
+        </div>
+    </div>
+
+    <div class="modal" id="mode-modal">
+        <div class="modal-content">
+            <div class="modal-title">Select Options</div>
+            
+            <button class="menu-btn active-mode" id="mode-add-btn">🔢 Infinite Addition</button>
+            <button class="menu-btn" id="mode-mix-btn">🔀 Mixed Arena (+ , - , *)</button>
+            
+            <div class="divider"></div>
+
+            <button class="menu-btn" id="btn-continue" style="border-color: #2EC4B6; color: #2EC4B6;">💾 Continue (Old Game)</button>
+            <button class="menu-btn" id="btn-fresh" style="border-color: #FF3366; color: #FF3366;">✨ Start Fresh (New Game)</button>
         </div>
     </div>
 
     <script>
-        const nameOverlay = document.getElementById('name-overlay');
-        const playerNameInput = document.getElementById('player-name-input');
-        const saveNameBtn = document.getElementById('save-name-btn');
-        const topRankBanner = document.getElementById('top-rank-banner');
-        
-        const interactiveCard = document.getElementById('interactive-card');
-        const mainPlayContent = document.getElementById('main-play-content');
-        const multiplayerSearching = document.getElementById('multiplayer-searching');
-        const correctFlashContent = document.getElementById('correct-flash-content');
-        const wrongFlashContent = document.getElementById('wrong-flash-content');
-        
-        const displayQuestion = document.getElementById('display-question');
+        // State variables
+        let currentLevel = 1;
+        let currentScore = 0;
+        let currentStreak = 0;
+        let highestStreak = 0;
+        let gameMode = 'addition'; // 'addition' or 'mixed'
+        let stepCount = 1; // For 3-step stair pattern (1=Easy, 2=Medium, 3=Hard)
+        let num1 = 0, num2 = 0, currentOperator = '+';
+
+        // Elements
+        const levelVal = document.getElementById('level-val');
+        const scoreVal = document.getElementById('score-val');
+        const streakVal = document.getElementById('streak-val');
+        const highStreakVal = document.getElementById('high-streak-val');
+        const questionText = document.getElementById('question-text');
         const answerInput = document.getElementById('answer-input');
-        const currentModeTag = document.getElementById('current-mode-tag');
-        
-        const submitAnswerBtn = document.getElementById('submit-answer-btn');
-        const switchModeTrigger = document.getElementById('switch-mode-trigger');
-        const newGameTrigger = document.getElementById('new-game-trigger');
+        const submitBtn = document.getElementById('submit-btn');
+        const newGameBtn = document.getElementById('new-game-btn');
+        const switchBtn = document.getElementById('switch-btn');
+        const modeModal = document.getElementById('mode-modal');
+        const feedbackOverlay = document.getElementById('feedback-overlay');
+        const feedbackIcon = document.getElementById('feedback-icon');
+        const feedbackText = document.getElementById('feedback-text');
 
-        let score = 0, streak = 0, level = 1, num1 = 0, num2 = 0, correctAnswer = 0, currentMode = 0; // 0: Addition, 1: Mixed, 2: Online 1v1 Simulation
-        let playerName = "";
+        // Modal Option Buttons
+        const modeAddBtn = document.getElementById('mode-add-btn');
+        const modeMixBtn = document.getElementById('mode-mix-btn');
+        const btnContinue = document.getElementById('btn-continue');
+        const btnFresh = document.getElementById('btn-fresh');
 
-        // Monthly High Score System (Persistent via LocalStorage)
-        function checkMonthlyLeaderboard() {
-            let topUser = localStorage.getItem('monthlyTopUser') || "AlphaPro";
-            let topScore = localStorage.getItem('monthlyTopScore') || 45;
-            topRankBanner.innerText = `🏆 Monthly #1: ${topUser} (${topScore} pts)`;
-        }
+        // Init Game on load safely
+        window.onload = function() {
+            // Load high streak record from localStorage
+            highestStreak = parseInt(localStorage.getItem('puzzle_high_streak')) || 0;
+            highStreakVal.innerText = highestStreak;
 
-        saveNameBtn.addEventListener('click', () => {
-            if(playerNameInput.value.trim() !== "") {
-                playerName = playerNameInput.value.trim();
-                nameOverlay.classList.add('hidden');
+            // Load last active game automatically if exists
+            if(localStorage.getItem('puzzle_saved_game') === 'true') {
+                loadOldGame();
+            } else {
                 generateQuestion();
             }
-        });
+        };
 
-        function updateUiStats() {
-            document.getElementById('score-val').innerText = score;
-            document.getElementById('streak-val').innerText = streak;
-            document.getElementById('level-val').innerText = level;
-            
-            let currentHighScore = parseInt(localStorage.getItem('monthlyTopScore') || 45);
-            if(score > currentHighScore) {
-                localStorage.setItem('monthlyTopScore', score);
-                localStorage.setItem('monthlyTopUser', playerName);
-                checkMonthlyLeaderboard();
-            }
-        }
-
+        // 3-Step Pattern Question Generator
         function generateQuestion() {
-            answerInput.value = ''; answerInput.focus();
-            
-            // Dynamic Difficulty Logic (Mixes Easy and Hard Infinite Loops)
-            let difficultyRange = Math.min(5 + (level * 4), 60); 
-            let isLuckyEasy = (Math.random() > 0.75); 
-            if(isLuckyEasy) difficultyRange = Math.max(5, difficultyRange - 15);
-
-            num1 = Math.floor(Math.random() * difficultyRange) + 2;
-            num2 = Math.floor(Math.random() * difficultyRange) + 1;
-
-            if (currentMode === 0) {
-                currentModeTag.innerText = "Infinite Addition";
-                correctAnswer = num1 + num2;
-                displayQuestion.innerText = `${num1} + ${num2}`;
-            } else if (currentMode === 1) {
-                currentModeTag.innerText = "Mixed Arena";
+            // Determine operator based on mode
+            if (gameMode === 'addition') {
+                currentOperator = '+';
+            } else {
                 const ops = ['+', '-', '*'];
-                const selectedOp = ops[Math.floor(Math.random() * ops.length)];
-                if(selectedOp === '+') { correctAnswer = num1 + num2; displayQuestion.innerText = `${num1} + ${num2}`; }
-                if(selectedOp === '-') { if(num1 < num2) { let t = num1; num1 = num2; num2 = t; } correctAnswer = num1 - num2; displayQuestion.innerText = `${num1} - ${num2}`; }
-                if(selectedOp === '*') { num1 = Math.floor(Math.random() * 9) + 2; num2 = Math.floor(Math.random() * 9) + 1; correctAnswer = num1 * num2; displayQuestion.innerText = `${num1} × ${num2}`; }
+                currentOperator = ops[Math.floor(Math.random() * ops.length)];
             }
+
+            // Generate numbers according to stepCount (Stair Pattern)
+            if (stepCount === 1) {
+                // Easy Step
+                num1 = Math.floor(Math.random() * 10) + 2;
+                num2 = Math.floor(Math.random() * 10) + 2;
+            } else if (stepCount === 2) {
+                // Medium Step
+                num1 = Math.floor(Math.random() * 40) + 11;
+                num2 = Math.floor(Math.random() * 40) + 11;
+            } else {
+                // Hard Step (Dynamic scaling with levels up to 332+456 style)
+                let maxRange = 50 + (currentLevel * 50);
+                if (maxRange > 800) maxRange = 800; 
+                num1 = Math.floor(Math.random() * maxRange) + 50;
+                num2 = Math.floor(Math.random() * maxRange) + 50;
+            }
+
+            // UI Render
+            questionText.innerHTML = `${num1} <span>${currentOperator}</span> ${num2}`;
+            answerInput.value = '';
+            answerInput.focus();
         }
 
-        // Mode Switching
-        switchModeTrigger.addEventListener('click', () => {
-            currentMode = (currentMode + 1) % 3;
-            if(currentMode === 2) {
-                mainPlayContent.classList.remove('flex');
-                multiplayerSearching.classList.add('flex');
-                setTimeout(() => {
-                    multiplayerSearching.classList.remove('flex');
-                    mainPlayContent.classList.add('flex');
-                    currentMode = 1; // Switches fallback to mixed arena mode challenge after pairing sim
-                    generateQuestion();
-                }, 2000);
+        // Answer Submission Check
+        function checkAnswer() {
+            const playerAns = parseInt(answerInput.value);
+            if (isNaN(playerAns)) return;
+
+            let correctAns;
+            if (currentOperator === '+') correctAns = num1 + num2;
+            else if (currentOperator === '-') correctAns = num1 - num2;
+            else if (currentOperator === '*') correctAns = num1 * num2;
+
+            if (playerAns === correctAns) {
+                // Correct Flow
+                currentScore += 1;
+                currentStreak += 1;
+                
+                // Advance Level smoothly every 3 correct answers
+                if (currentScore % 3 === 0) {
+                    currentLevel += 1;
+                }
+
+                // Manage Leaderboard High Streak (Only Streak dictates top position)
+                if (currentStreak > highestStreak) {
+                    highestStreak = currentStreak;
+                    localStorage.setItem('puzzle_high_streak', highestStreak);
+                    highStreakVal.innerText = highestStreak;
+                }
+
+                // Advance the stair difficulty loop (1 -> 2 -> 3 -> 1)
+                stepCount = stepCount < 3 ? stepCount + 1 : 1;
+
+                showFeedback(true);
             } else {
+                // Wrong Flow
+                currentStreak = 0; // Streak breaks instantly
+                showFeedback(false);
+            }
+
+            updateUIAndStorage();
+        }
+
+        // Update Text and localStorage
+        function updateUIAndStorage() {
+            levelVal.innerText = currentLevel;
+            scoreVal.innerText = currentScore;
+            streakVal.innerText = currentStreak;
+
+            // Save running game state securely
+            localStorage.setItem('puzzle_saved_game', 'true');
+            localStorage.setItem('puzzle_lvl', currentLevel);
+            localStorage.setItem('puzzle_scr', currentScore);
+            localStorage.setItem('puzzle_stk', currentStreak);
+            localStorage.setItem('puzzle_mode', gameMode);
+            localStorage.setItem('puzzle_step', stepCount);
+        }
+
+        // Burst feedback overlays
+        function showFeedback(isCorrect) {
+            feedbackOverlay.className = 'feedback-overlay ' + (isCorrect ? 'correct' : 'wrong');
+            feedbackIcon.innerText = isCorrect ? '✓' : '✗';
+            feedbackText.innerText = isCorrect ? 'Awesome!' : 'Wrong!';
+            feedbackOverlay.style.display = 'flex';
+
+            setTimeout(() => {
+                feedbackOverlay.style.display = 'none';
                 generateQuestion();
-            }
-        });
-
-        newGameTrigger.addEventListener('click', () => {
-            score = 0; streak = 0; level = 1;
-            updateUiStats();
-            generateQuestion();
-        });
-
-        function runEvaluationCheck() {
-            const playerInput = parseInt(answerInput.value);
-            if (isNaN(playerInput)) return;
-
-            if (playerInput === correctAnswer) {
-                score += 1; streak += 1; if (streak % 3 === 0) level += 1;
-                updateUiStats();
-
-                mainPlayContent.classList.remove('flex');
-                correctFlashContent.classList.add('flex', 'animate-zoom-success');
-                interactiveCard.classList.add('correct-state');
-
-                setTimeout(() => {
-                    interactiveCard.classList.remove('correct-state');
-                    correctFlashContent.classList.remove('flex', 'animate-zoom-success');
-                    mainPlayContent.classList.add('flex');
-                    generateQuestion();
-                }, 1100);
-            } else {
-                streak = 0;
-                updateUiStats();
-
-                mainPlayContent.classList.remove('flex');
-                wrongFlashContent.classList.add('flex', 'animate-zoom-fail');
-                interactiveCard.classList.add('wrong-state');
-
-                setTimeout(() => {
-                    interactiveCard.classList.remove('wrong-state');
-                    wrongFlashContent.classList.remove('flex', 'animate-zoom-fail');
-                    mainPlayContent.classList.add('flex');
-                    generateQuestion();
-                }, 1300);
-            }
+            }, 1000);
         }
 
-        submitAnswerBtn.addEventListener('click', runEvaluationCheck);
-        answerInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') runEvaluationCheck(); });
-        checkMonthlyLeaderboard();
+        // Game Initialization Options
+        function startFreshNewGame() {
+            currentLevel = 1;
+            currentScore = 0;
+            currentStreak = 0;
+            stepCount = 1;
+            updateUIAndStorage();
+            generateQuestion();
+        }
+
+        function loadOldGame() {
+            currentLevel = parseInt(localStorage.getItem('puzzle_lvl')) || 1;
+            currentScore = parseInt(localStorage.getItem('puzzle_scr')) || 0;
+            currentStreak = parseInt(localStorage.getItem('puzzle_stk')) || 0;
+            gameMode = localStorage.getItem('puzzle_mode') || 'addition';
+            stepCount = parseInt(localStorage.getItem('puzzle_step')) || 1;
+
+            if(gameMode === 'mixed') {
+                modeMixBtn.classList.add('active-mode');
+                modeAddBtn.classList.remove('active-mode');
+            } else {
+                modeAddBtn.classList.add('active-mode');
+                modeMixBtn.classList.remove('active-mode');
+            }
+
+            updateUIAndStorage();
+            generateQuestion();
+        }
+
+        // Event Listeners
+        submitBtn.onclick = checkAnswer;
+        answerInput.onkeydown = (e) => { if (e.key === 'Enter') checkAnswer(); };
+
+        newGameBtn.onclick = function() {
+            if(confirm("क्या आप सच में नया गेम शुरू करके वर्तमान स्कोर को 0 करना चाहते हैं?")) {
+                startFreshNewGame();
+            }
+        };
+
+        // Modal Controls
+        switchBtn.onclick = () => modeModal.classList.add('active');
+        
+        // Hide modal when clicked outside content
+        modeModal.onclick = (e) => { if(e.target === modeModal) modeModal.classList.remove('active'); };
+
+        modeAddBtn.onclick = function() {
+            gameMode = 'addition';
+            modeAddBtn.classList.add('active-mode');
+            modeMixBtn.classList.remove('active-mode');
+            generateQuestion();
+            updateUIAndStorage();
+            modeModal.classList.remove('active');
+        };
+
+        modeMixBtn.onclick = function() {
+            gameMode = 'mixed';
+            modeMixBtn.classList.add('active-mode');
+            modeAddBtn.classList.remove('active-mode');
+            generateQuestion();
+            updateUIAndStorage();
+            modeModal.classList.remove('active');
+        };
+
+        btnContinue.onclick = function() {
+            loadOldGame();
+            modeModal.classList.remove('active');
+        };
+
+        btnFresh.onclick = function() {
+            startFreshNewGame();
+            modeModal.classList.remove('active');
+        };
     </script>
 </body>
 </html>
