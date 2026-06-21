@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Math Arena - Mini Edition</title>
+    <title>Math Arena - Gaming Edition</title>
     <style>
         * {
             margin: 0;
@@ -23,13 +23,13 @@
         }
 
         .game-container {
-            background: #151922;
+            background: #1f2833;
             padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
-            border: 1px solid #232936;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+            border: 2px solid #45f3ff;
             width: 90%;
-            max-width: 400px;
+            max-width: 450px;
             text-align: center;
             position: relative;
         }
@@ -40,61 +40,67 @@
             right: 15px;
         }
 
-        .menu-btn {
-            background: #232936;
+        .icon-btn {
+            background: rgba(0, 0, 0, 0.4);
             color: #45f3ff;
             border: 1px solid #45f3ff;
-            padding: 6px 12px;
-            font-size: 0.85rem;
-            border-radius: 20px;
+            width: 40px;
+            height: 40px;
+            font-size: 1.2rem;
+            border-radius: 50%;
             cursor: pointer;
-            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 10px rgba(69, 243, 255, 0.2);
             transition: 0.2s;
         }
 
-        .menu-btn:hover {
+        .icon-btn:hover {
             background: #45f3ff;
             color: #0b0c10;
-            box-shadow: 0 0 10px #45f3ff;
+            box-shadow: 0 0 15px #45f3ff;
+            transform: scale(1.05);
         }
 
         .game-header h1 {
-            font-size: 1.5rem;
             color: #fff;
+            font-size: 2.2rem;
+            letter-spacing: 2px;
             margin-bottom: 5px;
-            letter-spacing: 1px;
         }
 
-        .game-header span {
+        .game-header h1 span {
             color: #45f3ff;
         }
 
         .current-mode {
-            color: #8b949e;
-            font-size: 0.9rem;
-            margin-bottom: 25px;
+            color: #66fcf1;
+            font-size: 1rem;
+            margin-bottom: 30px;
             text-transform: uppercase;
+            letter-spacing: 1px;
             font-weight: bold;
         }
 
         .question-box {
-            background: #0d1117;
-            border: 1px solid #1f242c;
+            background: #0b0c10;
+            border: 1px solid #66fcf1;
             border-radius: 8px;
             padding: 25px 15px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
         #display-question {
-            font-size: 2.2rem;
+            font-size: 2.5rem;
             color: #fff;
             font-weight: bold;
             margin-bottom: 10px;
         }
 
         .score-board {
-            font-size: 0.95rem;
-            color: #8b949e;
+            font-size: 1.1rem;
+            color: #c5c6c7;
         }
 
         #score-val {
@@ -110,36 +116,38 @@
 
         #answer-input {
             width: 100%;
-            padding: 12px;
-            font-size: 1.2rem;
-            background: #0d1117;
-            border: 1px solid #232936;
+            padding: 15px;
+            font-size: 1.3rem;
+            background: #0b0c10;
+            border: 1px solid #66fcf1;
             color: #fff;
-            border-radius: 6px;
+            border-radius: 8px;
             text-align: center;
             outline: none;
         }
 
         #answer-input:focus {
-            border-color: #45f3ff;
+            box-shadow: 0 0 10px rgba(69, 243, 255, 0.5);
         }
 
         .submit-btn {
-            background: #45f3ff;
-            color: #0b0c10;
-            border: none;
-            padding: 12px;
+            background: #0b0c10;
+            color: #fff;
+            border: 1px solid #66fcf1;
+            padding: 15px;
             font-size: 1.1rem;
             font-weight: bold;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             width: 100%;
             transition: 0.2s;
         }
 
         .submit-btn:hover {
-            background: #fff;
-            box-shadow: 0 0 15px #45f3ff;
+            background: #66fcf1;
+            color: #0b0c10;
+            box-shadow: 0 0 15px #66fcf1;
+            transform: scale(1.02);
         }
 
         .feedback-message {
@@ -147,14 +155,17 @@
             font-weight: bold;
             margin-top: 10px;
             min-height: 24px;
+            letter-spacing: 0.5px;
         }
 
         .correct {
-            color: #2e7d32;
+            color: #45f3ff;
+            text-shadow: 0 0 8px rgba(69, 243, 255, 0.6);
         }
 
         .wrong {
-            color: #c62828;
+            color: #ff4a4a;
+            text-shadow: 0 0 8px rgba(255, 74, 74, 0.6);
         }
 
         .modal-overlay {
@@ -163,7 +174,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.85);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -171,54 +182,62 @@
         }
 
         .modal-box {
-            background: #151922;
-            padding: 25px;
-            border-radius: 12px;
-            border: 1px solid #232936;
+            background: #1f2833;
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid #45f3ff;
             width: 85%;
-            max-width: 320px;
+            max-width: 350px;
             text-align: center;
+            box-shadow: 0 0 25px rgba(69, 243, 255, 0.3);
         }
 
         .modal-box h3 {
             color: #fff;
-            margin-bottom: 15px;
-            font-size: 1.2rem;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            letter-spacing: 1px;
         }
 
         .session-options {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
         }
 
         .session-btn {
-            background: #0d1117;
+            background: #0b0c10;
             color: #fff;
-            border: 1px solid #232936;
-            padding: 12px;
-            font-size: 0.95rem;
-            border-radius: 6px;
+            border: 1px solid #66fcf1;
+            padding: 14px;
+            font-size: 1rem;
+            border-radius: 8px;
             cursor: pointer;
             transition: 0.2s;
             font-weight: 500;
         }
 
         .session-btn:hover {
-            border-color: #45f3ff;
-            color: #45f3ff;
-            background: #1f2833;
+            background: #66fcf1;
+            color: #0b0c10;
+            box-shadow: 0 0 10px #66fcf1;
         }
 
         .close-btn {
             background: #991b1b;
             color: #fff;
-            margin-top: 15px;
+            margin-top: 20px;
             border: none;
-            padding: 8px;
-            border-radius: 6px;
+            padding: 10px;
+            border-radius: 8px;
             width: 100%;
             cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .close-btn:hover {
+            background: #cc2424;
         }
 
         .hidden {
@@ -230,7 +249,7 @@
 
     <div class="game-container">
         <div class="menu-corner">
-            <button class="menu-btn" id="open-sessions-btn">Select Mode ⚙️</button>
+            <button class="icon-btn" id="open-sessions-btn" title="Select Mode">⚙️</button>
         </div>
 
         <div class="game-header">
@@ -285,7 +304,7 @@
 
         function playClick() {
             clickSound.currentTime = 0;
-            clickSound.play().catch(e => console.log("Sound play error"));
+            clickSound.play().catch(e => console.log("Sound error"));
         }
 
         openSessionsBtn.addEventListener('click', () => {
@@ -383,3 +402,4 @@
     </script>
 </body>
 </html>
+
