@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Addition Puzzle Game</title>
+    <title>Math Puzzle Arena</title>
     <style>
         * {
             box-sizing: border-box;
@@ -13,12 +13,12 @@
         }
 
         body {
-            background-color: #F9F9F6;
+            background-color: #121212;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            color: #333;
+            color: #FFF;
         }
 
         .game-container {
@@ -28,19 +28,18 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 15px;
+            gap: 20px;
         }
 
-        /* Top Stats Bar */
+        /* Stats Bar (Video Style) */
         .stats-bar {
             width: 100%;
             display: flex;
             justify-content: space-between;
-            background: #FFF;
-            padding: 12px 15px;
+            background: #1E1E1E;
+            padding: 15px;
             border-radius: 16px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            border: 2px solid #EAEAEA;
+            border: 2px solid #333;
         }
 
         .stat-item {
@@ -51,110 +50,103 @@
             font-size: 14px;
         }
 
-        /* Top Leaderboard Streak Display */
-        .top-streak-banner {
-            font-size: 13px;
-            color: #666;
-            font-weight: 600;
-            background: #EAEAEA;
-            padding: 4px 12px;
-            border-radius: 20px;
-            margin-bottom: -5px;
-        }
-
-        /* Main Puzzle Box (Video Style) */
+        /* Main Puzzle Box with Dotted Grid */
         .puzzle-box {
             width: 100%;
-            background: #FFF;
-            border: 3px solid #111;
+            background: #1E1E1E;
+            border: 3px solid #333;
             border-radius: 24px;
-            padding: 30px 20px;
+            padding: 40px 20px;
             position: relative;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 20px;
-            box-shadow: 0 8px 0 #111;
-            background-image: radial-gradient(#E0E0E0 1.5px, transparent 1.5px);
-            background-size: 15px 15px;
+            gap: 25px;
+            box-shadow: 0 10px 0 #000;
+            background-image: radial-gradient(#444 1.5px, transparent 1.5px);
+            background-size: 18px 18px;
+        }
+
+        .current-mode-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #AAA;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: #2D2D2D;
+            padding: 4px 12px;
+            border-radius: 20px;
         }
 
         .question {
-            font-size: 42px;
+            font-size: 46px;
             font-weight: 800;
-            color: #111;
+            color: #FFF;
             letter-spacing: 2px;
         }
 
         .question span {
-            color: #4A3AFF;
+            color: #A855F7;
         }
 
         .input-box {
             width: 85%;
             height: 65px;
-            border: 3px solid #111;
+            border: 3px solid #333;
             border-radius: 16px;
+            background: #121212;
             text-align: center;
             font-size: 32px;
             font-weight: 700;
-            color: #111;
+            color: #FFF;
             outline: none;
-            transition: all 0.2s;
-        }
-
-        .input-box::placeholder {
-            color: #AAA;
         }
 
         .submit-btn {
             width: 85%;
             height: 55px;
-            background: #7F56D9;
+            background: #7C3AED;
             color: white;
-            border: 3px solid #111;
+            border: 2px solid #000;
             border-radius: 16px;
             font-size: 20px;
             font-weight: 700;
             cursor: pointer;
-            box-shadow: 0 4px 0 #111;
+            box-shadow: 0 4px 0 #000;
             transition: transform 0.1s, box-shadow 0.1s;
         }
 
         .submit-btn:active {
             transform: translateY(4px);
-            box-shadow: 0 0px 0 #111;
+            box-shadow: 0 0px 0 #000;
         }
 
-        /* Bottom Controls */
+        /* Controls */
         .control-btns {
             width: 100%;
             display: flex;
-            gap: 10px;
+            gap: 12px;
         }
 
         .action-btn {
             flex: 1;
-            padding: 12px;
-            border: 2px solid #111;
-            border-radius: 12px;
+            padding: 14px;
+            border: 2px solid #333;
+            border-radius: 14px;
             font-size: 14px;
             font-weight: 700;
-            background: #FFF;
+            background: #1E1E1E;
+            color: #FFF;
             cursor: pointer;
-            box-shadow: 0 3px 0 #111;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 5px;
+            box-shadow: 0 4px 0 #000;
         }
 
         .action-btn:active {
-            transform: translateY(3px);
-            box-shadow: 0 0px 0 #111;
+            transform: translateY(4px);
+            box-shadow: 0 0px 0 #000;
         }
 
-        /* Feedback Overlay (Burst Animation) */
+        /* Feedback Overlay */
         .feedback-overlay {
             position: absolute;
             top: 0;
@@ -170,126 +162,116 @@
             display: none;
         }
 
-        .feedback-overlay.correct {
-            background: #2EC4B6;
-            color: white;
-            animation: burst 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
+        .feedback-overlay.correct { background: #06B6D4; color: white; animation: burst 0.3s forwards; }
+        .feedback-overlay.wrong { background: #EF4444; color: white; animation: shake 0.3s ease-in-out; }
+        .feedback-icon { font-size: 60px; margin-bottom: 10px; }
+        .feedback-text { font-size: 24px; font-weight: 800; }
 
-        .feedback-overlay.wrong {
-            background: #FF3366;
-            color: white;
-            animation: shake 0.3s ease-in-out;
-        }
-
-        .feedback-icon {
-            font-size: 60px;
-            margin-bottom: 10px;
-        }
-
-        .feedback-text {
-            font-size: 24px;
-            font-weight: 800;
-        }
-
-        /* Switch Mode Modal (Pop-up Menus) */
+        /* Pop-up Menu Modal */
         .modal {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-            visibility: hidden;
-            opacity: 0;
-            transition: all 0.2s ease;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 100; visibility: hidden; opacity: 0; transition: all 0.2s ease;
         }
 
-        .modal.active {
-            visibility: visible;
-            opacity: 1;
-        }
+        .modal.active { visibility: visible; opacity: 1; }
 
         .modal-content {
-            background: white;
-            border: 3px solid #111;
+            background: #1E1E1E;
+            border: 3px solid #333;
             border-radius: 24px;
             padding: 25px;
             width: 90%;
-            max-width: 340px;
-            box-shadow: 0 8px 0 #111;
+            max-width: 350px;
+            box-shadow: 0 8px 0 #000;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
         }
 
-        .modal-title {
-            font-size: 18px;
-            font-weight: 800;
+        /* Leaderboard inside Switch Mode */
+        .leaderboard-box {
+            background: #2D2D2D;
+            border: 2px solid #444;
+            border-radius: 14px;
+            padding: 12px;
             text-align: center;
             margin-bottom: 5px;
+        }
+
+        .leaderboard-title {
+            font-size: 15px;
+            color: #FBBF24;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .player-profile {
+            font-size: 13px;
+            color: #DDD;
         }
 
         .menu-btn {
             width: 100%;
             padding: 12px;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 700;
-            border: 2px solid #111;
+            border: 2px solid #333;
             border-radius: 12px;
-            background: #FFF;
+            background: #121212;
+            color: #FFF;
             cursor: pointer;
             text-align: left;
         }
 
         .menu-btn.active-mode {
-            background: #E6E2FF;
-            border-color: #4A3AFF;
+            background: #7C3AED;
+            border-color: #A855F7;
         }
 
-        .menu-btn:hover {
-            background: #F5F5F5;
-        }
+        .divider { height: 2px; background: #333; margin: 4px 0; }
 
-        .menu-btn.active-mode:hover {
-            background: #E6E2FF;
-        }
-
-        .divider {
-            height: 2px;
-            background: #EAEAEA;
-            margin: 5px 0;
+        /* Setup Name Prompt Style */
+        .name-container {
+            background: #1E1E1E;
+            padding: 30px 20px;
+            border-radius: 24px;
+            border: 3px solid #333;
+            text-align: center;
+            width: 90%;
+            max-width: 350px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
 
         /* Animations */
-        @keyframes burst {
-            0% { transform: scale(0.6); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-10px); }
-            40%, 80% { transform: translateX(10px); }
-        }
+        @keyframes burst { 0% { transform: scale(0.7); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-8px); } 40%, 80% { transform: translateX(8px); } }
     </style>
 </head>
 <body>
 
+    <div id="name-setup-screen" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#121212; display:flex; justify-content:center; align-items:center; z-index:200; display:none;">
+        <div class="name-container">
+            <h2>🎮 Enter Your Name</h2>
+            <p style="color:#AAA; font-size:14px;">अपना नाम डालें, यह हमेशा के लिए सेव रहेगा।</p>
+            <input type="text" id="username-input" class="input-box" placeholder="Your Name..." style="width:100%;">
+            <button class="submit-btn" id="save-name-btn" style="width:100%;">Let's Play</button>
+        </div>
+    </div>
+
     <div class="game-container">
         <div class="stats-bar">
-            <div class="stat-item" style="color: #4A3AFF;">📈 LEVEL: <span id="level-val">1</span></div>
-            <div class="stat-item" style="color: #2EC4B6;">🏆 SCORE: <span id="score-val">0</span></div>
-            <div class="stat-item" style="color: #FF9F1C;">⚡ STREAK: <span id="streak-val">0</span></div>
+            <div class="stat-item" style="color: #A855F7;">📈 LEVEL: <span id="level-val">1</span></div>
+            <div class="stat-item" style="color: #06B6D4;">🏆 SCORE: <span id="score-val">0</span></div>
+            <div class="stat-item" style="color: #FBBF24;">⚡ STREAK: <span id="streak-val">0</span></div>
         </div>
 
-        <div class="top-streak-banner">👑 High Streak Record: <span id="high-streak-val">0</span></div>
-
         <div class="puzzle-box">
+            <div class="current-mode-title" id="mode-display-tag">Infinite Addition</div>
             <div class="question" id="question-text">6 <span>+</span> 5</div>
             <input type="number" class="input-box" id="answer-input" placeholder="?" inputmode="numeric">
             <button class="submit-btn" id="submit-btn">Submit</button>
@@ -302,103 +284,157 @@
 
         <div class="control-btns">
             <button class="action-btn" id="switch-btn">⚙ Switch Mode</button>
-            <button class="action-btn" id="new-game-btn" style="background: #FFF5F5;">🔄 New Game</button>
+            <button class="action-btn" id="new-game-btn" style="background: #2D1A1A; border-color: #EF4444;">🔄 New Game</button>
         </div>
     </div>
 
     <div class="modal" id="mode-modal">
         <div class="modal-content">
-            <div class="modal-title">Select Options</div>
+            <div class="leaderboard-box">
+                <div class="leaderboard-title">👑 LEADERBOARD RECORD</div>
+                <div class="player-profile" id="leaderboard-info">Player: Guest | High Streak: 0</div>
+            </div>
+
+            <div class="divider"></div>
+            <div style="font-size:12px; color:#AAA; font-weight:bold; margin-left:5px;">CHOOSE GAME MODE:</div>
             
-            <button class="menu-btn active-mode" id="mode-add-btn">🔢 Infinite Addition</button>
-            <button class="menu-btn" id="mode-mix-btn">🔀 Mixed Arena (+ , - , *)</button>
+            <button class="menu-btn active-mode" id="mode-add">➕ Infinite Addition</button>
+            <button class="menu-btn" id="mode-sub">➖ Sub Penalty</button>
+            <button class="menu-btn" id="mode-mul">✖ Multiply Master</button>
+            <button class="menu-btn" id="mode-div">➗ Divide Arena</button>
+            <button class="menu-btn" id="mode-mix">🔀 Mixed Arena (+, -, ×, ÷)</button>
             
             <div class="divider"></div>
 
-            <button class="menu-btn" id="btn-continue" style="border-color: #2EC4B6; color: #2EC4B6;">💾 Continue (Old Game)</button>
-            <button class="menu-btn" id="btn-fresh" style="border-color: #FF3366; color: #FF3366;">✨ Start Fresh (New Game)</button>
+            <button class="menu-btn" id="btn-continue" style="border-color: #06B6D4; color: #06B6D4;">💾 Continue (Old Game)</button>
+            <button class="menu-btn" id="btn-fresh" style="border-color: #EF4444; color: #EF4444;">✨ Start Fresh (New Game)</button>
         </div>
     </div>
 
     <script>
         // State variables
+        let playerName = "Guest";
         let currentLevel = 1;
         let currentScore = 0;
         let currentStreak = 0;
         let highestStreak = 0;
-        let gameMode = 'addition'; // 'addition' or 'mixed'
-        let stepCount = 1; // For 3-step stair pattern (1=Easy, 2=Medium, 3=Hard)
+        let gameMode = 'addition'; 
+        let stepCount = 1; 
         let num1 = 0, num2 = 0, currentOperator = '+';
 
         // Elements
         const levelVal = document.getElementById('level-val');
         const scoreVal = document.getElementById('score-val');
         const streakVal = document.getElementById('streak-val');
-        const highStreakVal = document.getElementById('high-streak-val');
         const questionText = document.getElementById('question-text');
         const answerInput = document.getElementById('answer-input');
         const submitBtn = document.getElementById('submit-btn');
         const newGameBtn = document.getElementById('new-game-btn');
         const switchBtn = document.getElementById('switch-btn');
         const modeModal = document.getElementById('mode-modal');
+        const modeDisplayTag = document.getElementById('mode-display-tag');
+        const leaderboardInfo = document.getElementById('leaderboard-info');
         const feedbackOverlay = document.getElementById('feedback-overlay');
         const feedbackIcon = document.getElementById('feedback-icon');
         const feedbackText = document.getElementById('feedback-text');
 
-        // Modal Option Buttons
-        const modeAddBtn = document.getElementById('mode-add-btn');
-        const modeMixBtn = document.getElementById('mode-mix-btn');
-        const btnContinue = document.getElementById('btn-continue');
-        const btnFresh = document.getElementById('btn-fresh');
+        // Name Setup Elements
+        const nameSetupScreen = document.getElementById('name-setup-screen');
+        const usernameInput = document.getElementById('username-input');
+        const saveNameBtn = document.getElementById('save-name-btn');
 
-        // Init Game on load safely
         window.onload = function() {
-            // Load high streak record from localStorage
-            highestStreak = parseInt(localStorage.getItem('puzzle_high_streak')) || 0;
-            highStreakVal.innerText = highestStreak;
+            // Permanent Name Check Lock
+            const savedName = localStorage.getItem('puzzle_player_name');
+            if (!savedName) {
+                nameSetupScreen.style.display = 'flex';
+            } else {
+                playerName = savedName;
+                initGameEngine();
+            }
+        };
 
-            // Load last active game automatically if exists
+        saveNameBtn.onclick = function() {
+            const typedName = usernameInput.value.trim();
+            if(typedName !== "") {
+                playerName = typedName;
+                localStorage.setItem('puzzle_player_name', playerName);
+                nameSetupScreen.style.display = 'none';
+                initGameEngine();
+            }
+        };
+
+        function initGameEngine() {
+            highestStreak = parseInt(localStorage.getItem('puzzle_high_streak')) || 0;
+            updateLeaderboardDisplay();
+
             if(localStorage.getItem('puzzle_saved_game') === 'true') {
                 loadOldGame();
             } else {
                 generateQuestion();
             }
-        };
+        }
 
-        // 3-Step Pattern Question Generator
+        function updateLeaderboardDisplay() {
+            leaderboardInfo.innerText = `Player: ${playerName} | High Streak: ${highestStreak}`;
+        }
+
+        // Fixed Math Question System with Real Operators Only
         function generateQuestion() {
-            // Determine operator based on mode
-            if (gameMode === 'addition') {
-                currentOperator = '+';
-            } else {
-                const ops = ['+', '-', '*'];
+            // Decide operator based on selected mode
+            if (gameMode === 'addition') currentOperator = '+';
+            else if (gameMode === 'subtraction') currentOperator = '-';
+            else if (gameMode === 'multiplication') currentOperator = '×';
+            else if (gameMode === 'division') currentOperator = '➗';
+            else {
+                const ops = ['+', '-', '×', '➗'];
                 currentOperator = ops[Math.floor(Math.random() * ops.length)];
             }
 
-            // Generate numbers according to stepCount (Stair Pattern)
-            if (stepCount === 1) {
-                // Easy Step
-                num1 = Math.floor(Math.random() * 10) + 2;
-                num2 = Math.floor(Math.random() * 10) + 2;
-            } else if (stepCount === 2) {
-                // Medium Step
-                num1 = Math.floor(Math.random() * 40) + 11;
-                num2 = Math.floor(Math.random() * 40) + 11;
-            } else {
-                // Hard Step (Dynamic scaling with levels up to 332+456 style)
-                let maxRange = 50 + (currentLevel * 50);
-                if (maxRange > 800) maxRange = 800; 
-                num1 = Math.floor(Math.random() * maxRange) + 50;
-                num2 = Math.floor(Math.random() * maxRange) + 50;
+            // Adjust difficulty range dynamically with stepCount loops
+            if (currentOperator === '+' || currentOperator === '-') {
+                if (stepCount === 1) {
+                    num1 = Math.floor(Math.random() * 12) + 2;
+                    num2 = Math.floor(Math.random() * 12) + 2;
+                } else if (stepCount === 2) {
+                    num1 = Math.floor(Math.random() * 50) + 12;
+                    num2 = Math.floor(Math.random() * 50) + 12;
+                } else {
+                    // level up range goes up to 332+456 safely
+                    let maxRange = 100 + (currentLevel * 60);
+                    if (maxRange > 850) maxRange = 850;
+                    num1 = Math.floor(Math.random() * maxRange) + 50;
+                    num2 = Math.floor(Math.random() * maxRange) + 50;
+                }
+                // Ensure no negative results for subtraction mode to keep it clean
+                if (currentOperator === '-' && num1 < num2) {
+                    let temp = num1; num1 = num2; num2 = temp;
+                }
+            } 
+            else if (currentOperator === '×') {
+                // Multiplication stays always smart and brain-solvable
+                if (stepCount === 1) {
+                    num1 = Math.floor(Math.random() * 10) + 2;
+                    num2 = Math.floor(Math.random() * 5) + 2;
+                } else {
+                    num1 = Math.floor(Math.random() * 15) + 5;
+                    num2 = Math.floor(Math.random() * 12) + 2;
+                }
+            } 
+            else if (currentOperator === '➗') {
+                // Perfectly divisible numbers rule
+                let baseNum2 = Math.floor(Math.random() * 10) + 2;
+                let multiplier = Math.floor(Math.random() * 12) + 2;
+                num1 = baseNum2 * multiplier; // Ensures clean integer answers
+                num2 = baseNum2;
             }
 
-            // UI Render
+            // UI Rendering Fix (No code characters shown!)
             questionText.innerHTML = `${num1} <span>${currentOperator}</span> ${num2}`;
             answerInput.value = '';
             answerInput.focus();
         }
 
-        // Answer Submission Check
         function checkAnswer() {
             const playerAns = parseInt(answerInput.value);
             if (isNaN(playerAns)) return;
@@ -406,45 +442,35 @@
             let correctAns;
             if (currentOperator === '+') correctAns = num1 + num2;
             else if (currentOperator === '-') correctAns = num1 - num2;
-            else if (currentOperator === '*') correctAns = num1 * num2;
+            else if (currentOperator === '×') correctAns = num1 * num2;
+            else if (currentOperator === '➗') correctAns = num1 / num2;
 
             if (playerAns === correctAns) {
-                // Correct Flow
                 currentScore += 1;
                 currentStreak += 1;
                 
-                // Advance Level smoothly every 3 correct answers
-                if (currentScore % 3 === 0) {
-                    currentLevel += 1;
-                }
+                if (currentScore % 3 === 0) currentLevel += 1;
 
-                // Manage Leaderboard High Streak (Only Streak dictates top position)
                 if (currentStreak > highestStreak) {
                     highestStreak = currentStreak;
                     localStorage.setItem('puzzle_high_streak', highestStreak);
-                    highStreakVal.innerText = highestStreak;
+                    updateLeaderboardDisplay();
                 }
 
-                // Advance the stair difficulty loop (1 -> 2 -> 3 -> 1)
                 stepCount = stepCount < 3 ? stepCount + 1 : 1;
-
                 showFeedback(true);
             } else {
-                // Wrong Flow
-                currentStreak = 0; // Streak breaks instantly
+                currentStreak = 0;
                 showFeedback(false);
             }
-
             updateUIAndStorage();
         }
 
-        // Update Text and localStorage
         function updateUIAndStorage() {
             levelVal.innerText = currentLevel;
             scoreVal.innerText = currentScore;
             streakVal.innerText = currentStreak;
 
-            // Save running game state securely
             localStorage.setItem('puzzle_saved_game', 'true');
             localStorage.setItem('puzzle_lvl', currentLevel);
             localStorage.setItem('puzzle_scr', currentScore);
@@ -453,7 +479,6 @@
             localStorage.setItem('puzzle_step', stepCount);
         }
 
-        // Burst feedback overlays
         function showFeedback(isCorrect) {
             feedbackOverlay.className = 'feedback-overlay ' + (isCorrect ? 'correct' : 'wrong');
             feedbackIcon.innerText = isCorrect ? '✓' : '✗';
@@ -463,10 +488,9 @@
             setTimeout(() => {
                 feedbackOverlay.style.display = 'none';
                 generateQuestion();
-            }, 1000);
+            }, 900);
         }
 
-        // Game Initialization Options
         function startFreshNewGame() {
             currentLevel = 1;
             currentScore = 0;
@@ -483,60 +507,48 @@
             gameMode = localStorage.getItem('puzzle_mode') || 'addition';
             stepCount = parseInt(localStorage.getItem('puzzle_step')) || 1;
 
-            if(gameMode === 'mixed') {
-                modeMixBtn.classList.add('active-mode');
-                modeAddBtn.classList.remove('active-mode');
-            } else {
-                modeAddBtn.classList.add('active-mode');
-                modeMixBtn.classList.remove('active-mode');
-            }
-
+            setActiveModeVisual(gameMode);
             updateUIAndStorage();
             generateQuestion();
         }
 
-        // Event Listeners
+        function setActiveModeVisual(mode) {
+            const modeIds = { 'addition': 'mode-add', 'subtraction': 'mode-sub', 'multiplication': 'mode-mul', 'division': 'mode-div', 'mixed': 'mode-mix' };
+            document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active-mode'));
+            
+            const activeBtn = document.getElementById(modeIds[mode]);
+            if(activeBtn) {
+                activeBtn.classList.add('active-mode');
+                modeDisplayTag.innerText = activeBtn.innerText.replace(/^[^\s]+\s*/, '');
+            }
+        }
+
+        function selectMode(mode) {
+            gameMode = mode;
+            setActiveModeVisual(mode);
+            generateQuestion();
+            updateUIAndStorage();
+            modeModal.classList.remove('active');
+        }
+
+        // Mode click mapping
+        document.getElementById('mode-add').onclick = () => selectMode('addition');
+        document.getElementById('mode-sub').onclick = () => selectMode('subtraction');
+        document.getElementById('mode-mul').onclick = () => selectMode('multiplication');
+        document.getElementById('mode-div').onclick = () => selectMode('division');
+        document.getElementById('mode-mix').onclick = () => selectMode('mixed');
+
         submitBtn.onclick = checkAnswer;
         answerInput.onkeydown = (e) => { if (e.key === 'Enter') checkAnswer(); };
+        switchBtn.onclick = () => modeModal.classList.add('active');
+        modeModal.onclick = (e) => { if(e.target === modeModal) modeModal.classList.remove('active'); };
+        btnContinue.onclick = () => { loadOldGame(); modeModal.classList.remove('active'); };
+        btnFresh.onclick = () => { startFreshNewGame(); modeModal.classList.remove('active'); };
 
         newGameBtn.onclick = function() {
             if(confirm("क्या आप सच में नया गेम शुरू करके वर्तमान स्कोर को 0 करना चाहते हैं?")) {
                 startFreshNewGame();
             }
-        };
-
-        // Modal Controls
-        switchBtn.onclick = () => modeModal.classList.add('active');
-        
-        // Hide modal when clicked outside content
-        modeModal.onclick = (e) => { if(e.target === modeModal) modeModal.classList.remove('active'); };
-
-        modeAddBtn.onclick = function() {
-            gameMode = 'addition';
-            modeAddBtn.classList.add('active-mode');
-            modeMixBtn.classList.remove('active-mode');
-            generateQuestion();
-            updateUIAndStorage();
-            modeModal.classList.remove('active');
-        };
-
-        modeMixBtn.onclick = function() {
-            gameMode = 'mixed';
-            modeMixBtn.classList.add('active-mode');
-            modeAddBtn.classList.remove('active-mode');
-            generateQuestion();
-            updateUIAndStorage();
-            modeModal.classList.remove('active');
-        };
-
-        btnContinue.onclick = function() {
-            loadOldGame();
-            modeModal.classList.remove('active');
-        };
-
-        btnFresh.onclick = function() {
-            startFreshNewGame();
-            modeModal.classList.remove('active');
         };
     </script>
 </body>
