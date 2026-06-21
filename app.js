@@ -1,95 +1,50 @@
-// DualMind-Arena - Core Game Logic & Brain
+// एलिमेंट्स को सिलेक्ट करना
+const dashboard = document.getElementById('dashboard');
+const gameScreen = document.getElementById('game-screen');
+const soloBadgesBtn = document.getElementById('solo-badges-btn');
+const enterArenaBtn = document.getElementById('enter-arena-btn');
+const startGameBtn = document.getElementById('start-game-btn');
 
-// Global Player Object to store live stats
-let player = {
-    name: "",
-    level: 1,
-    points: 0,
-    wins: 0,
-    streak: 0
-};
-
-// Sound Elements
 const bgMusic = document.getElementById('bg-music');
 const clickSound = document.getElementById('click-sound');
+const volumeSlider = document.getElementById('volume-slider');
 
-// Function to play button click sound safely
+// पहली बार स्क्रीन पर क्लिक करते ही बैकग्राउंड म्यूजिक चालू करना
+document.body.addEventListener('click', () => {
+    if (bgMusic.paused) {
+        bgMusic.play().catch(err => console.log("Music play blocked initially"));
+        bgMusic.volume = volumeSlider.value / 100;
+    }
+}, { once: true });
+
+// वॉल्यूम कंट्रोलर लॉजिक
+volumeSlider.addEventListener('input', (e) => {
+    bgMusic.volume = e.target.value / 100;
+});
+
+// बटन क्लिक साउंड फंक्शन
 function playClick() {
-    if (clickSound) {
-        clickSound.currentTime = 0;
-        clickSound.play().catch(e => console.log("Audio play blocked by browser setup."));
-    }
+    clickSound.currentTime = 0;
+    clickSound.play();
 }
 
-// 1. Initialize Player and Transition from Login to Main Menu
-function initPlayer() {
-    playClick();
-    const nameInput = document.getElementById('username-input').value.trim();
-    
-    if (nameInput === "") {
-        alert("Please enter a valid player name, bro!");
-        return;
-    }
-    
-    // Set Player Name
-    player.name = nameInput;
-    document.getElementById('player-title').innerText = player.name + "'s Dashboard";
-    
-    // Hide Login Screen and Show Main Menu
-    document.getElementById('login-screen').classList.add('hidden');
-    document.getElementById('main-menu').classList.remove('hidden');
-    
-    // Start Background Music smoothly after first user interaction
-    if (bgMusic) {
-        bgMusic.volume = 0.3; // Low volume for background ambiance
-        bgMusic.play().catch(e => console.log("Music waiting for deeper user action."));
-    }
-}
-
-// 2. Mode Selection Router
-function selectMode(modeName) {
+// 'Solo Badges' बटन पर क्लिक का लॉजिक (पुराना अलर्ट हटा दिया!)
+soloBadgesBtn.addEventListener('click', () => {
     playClick();
     
-    switch(modeName) {
-        case 'solo':
-            alert("Launching Solo Badges (+, -, ×, ÷) for " + player.name + "!");
-            // Solo Mode loading logic will go here
-            break;
-        case 'mixed':
-            alert("Starting Mind Test (Mixed Mode)! Prepare your brain!");
-            // Mixed Mode loading logic will go here
-            break;
-        case 'arena':
-            alert("⚠️ Entering the Arena! Speed and Accuracy matter here! ⚠️");
-            // Arena Mode loading logic will go here
-            break;
-        case 'multiplayer':
-            alert("Searching for an online live 1v1 opponent... (Feature incoming)");
-            // Matchmaking logic will go here
-            break;
-        case 'leaderboard':
-            alert("Fetching Monthly Top 100 Leaderboard data...");
-            // API calling for leaderboard will go here
-            break;
-        default:
-            console.log("Unknown mode selected.");
-    }
-}
+    // डैशबोर्ड छुपाओ और जोड़ वाले सेशन का बॉक्स दिखाओ
+    dashboard.classList.add('hidden');
+    gameScreen.classList.remove('hidden');
+});
 
-// 3. Anti-Cheat / Connection Status Monitor
-function updateOnlineStatus() {
-    const overlay = document.getElementById('disconnection-overlay');
-    if (navigator.onLine) {
-        overlay.classList.add('hidden');
-    } else {
-        overlay.classList.remove('hidden');
-        if (bgMusic) bgMusic.pause();
-    }
-}
+// 'Enter Arena' बटन (अभी के लिए सिर्फ क्लिक साउंड करेगा)
+enterArenaBtn.addEventListener('click', () => {
+    playClick();
+});
 
-// Listen for network changes securely
-window.addEventListener('online', updateOnlineStatus);
-window.addEventListener('offline', updateOnlineStatus);
-
-// Run connection check immediately on launch
-updateOnlineStatus();
+// 'Start Game' बटन पर क्लिक का लॉजिक
+startGameBtn.addEventListener('click', () => {
+    playClick();
+    // यहाँ से हमारा असली सवाल-जवाब वाला कोड शुरू होगा
+    alert("अरे वाह भाई! गेम स्टार्ट हो गया। अब अगले कदम में सवाल लोड करेंगे!");
+});
