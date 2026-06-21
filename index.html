@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Math Arena - Video Accurate Edition</title>
+    <title>Math Arena - Ultimate Edition</title>
     <style>
         * {
             margin: 0;
@@ -29,14 +29,53 @@
             max-width: 380px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
             align-items: center;
         }
 
+        /* Name Overlay Screen */
+        .overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #fff9e6;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+        }
+
+        .overlay-card {
+            background: #ffffff;
+            border: 4px solid #11142a;
+            box-shadow: 0 10px 0px #11142a;
+            border-radius: 28px;
+            padding: 30px 20px;
+            width: 100%;
+            max-width: 340px;
+            text-align: center;
+        }
+
+        .overlay-title { font-size: 1.8rem; font-weight: 900; color: #11142a; margin-bottom: 15px; }
+        
+        .global-input {
+            width: 100%;
+            padding: 14px;
+            font-size: 1.2rem;
+            border: 3px solid #11142a;
+            border-radius: 16px;
+            outline: none;
+            text-align: center;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        /* Stats & Header */
         .stats-bar {
             background: #ffffff;
             width: 100%;
-            padding: 12px 20px;
+            padding: 12px 16px;
             border-radius: 20px;
             display: flex;
             justify-content: space-between;
@@ -45,182 +84,112 @@
             border: 2px solid #11142a;
         }
 
-        .stat-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .stat-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
-        }
-
+        .stat-item { display: flex; align-items: center; gap: 6px; }
+        .stat-icon { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
         .icon-purple { background: #f3e8ff; color: #7c3aed; }
         .icon-green { background: #dcfce7; color: #16a34a; }
         .icon-orange { background: #ffedd5; color: #ea580c; }
-
         .stat-text { display: flex; flex-direction: column; }
-        .stat-label { font-size: 0.65rem; text-transform: uppercase; font-weight: 800; color: #6b7280; }
-        .stat-value { font-size: 1.1rem; font-weight: 900; color: #11142a; }
+        .stat-label { font-size: 0.6rem; text-transform: uppercase; font-weight: 800; color: #6b7280; }
+        .stat-value { font-size: 1rem; font-weight: 900; color: #11142a; }
 
-        .card-container {
-            width: 100%;
-            height: 380px;
-            position: relative;
-        }
-
+        /* Game Card Setup */
+        .card-container { width: 100%; height: 380px; position: relative; }
+        
         .game-card {
             background-color: #ffffff;
             background-image: radial-gradient(#e5e7eb 1.5px, transparent 1.5px), radial-gradient(#e5e7eb 1.5px, #ffffff 1.5px);
             background-size: 24px 24px;
             background-position: 0 0, 12px 12px;
-            width: 100%;
-            height: 100%;
+            width: 100%; height: 100%;
             border-radius: 32px;
             border: 4px solid #11142a;
             box-shadow: 0 10px 0px #11142a;
-            padding: 30px 24px;
+            padding: 24px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             align-items: center;
             overflow: hidden;
+            position: relative;
         }
 
-        .game-card.correct-state {
-            background: #1db97e !important;
-            background-image: none !important;
-        }
-
-        .game-card.wrong-state {
-            background: #e65353 !important;
-            background-image: none !important;
-        }
+        .game-card.correct-state { background: #1db97e !important; background-image: none !important; }
+        .game-card.wrong-state { background: #e65353 !important; background-image: none !important; }
 
         .flash-content {
             display: none;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100%;
-            width: 100%;
-            gap: 20px;
+            height: 100%; width: 100%; gap: 15px;
         }
 
-        /* Video Accurate Jump/Bounce Animation */
-        @keyframes bounceInUp {
-            0% {
-                transform: translateY(150px) scale(0.8);
-                opacity: 0;
-            }
-            60% {
-                transform: translateY(-10px) scale(1.05);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(0) scale(1);
-            }
+        /* Accurate Zoom Burst Animations */
+        @keyframes zoomBurstSuccess {
+            0% { transform: scale(0); opacity: 0; }
+            70% { transform: scale(1.15); }
+            100% { transform: scale(1); opacity: 1; }
         }
 
-        .animate-bounce-jump {
-            animation: bounceInUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+        @keyframes zoomBurstFail {
+            0% { transform: scale(0); opacity: 0; }
+            60% { transform: scale(1.1); }
+            70% { transform: translateX(-8px) scale(1); }
+            80% { transform: translateX(8px); }
+            90% { transform: translateX(-4px); }
+            100% { transform: translateX(0); opacity: 1; }
         }
+
+        .animate-zoom-success { animation: zoomBurstSuccess 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.2) both; }
+        .animate-zoom-fail { animation: zoomBurstFail 0.5s ease window both; }
 
         .flash-icon {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            border: 8px solid #ffffff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3.5rem;
-            font-weight: bold;
-            color: #ffffff;
+            width: 90px; height: 90px; border-radius: 50%; border: 6px solid #ffffff;
+            display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: bold; color: #ffffff;
         }
 
-        .flash-text {
-            font-size: 2.2rem;
-            font-weight: 900;
-            color: #ffffff;
-            letter-spacing: 0.5px;
-        }
+        .flash-text { font-size: 2rem; font-weight: 900; color: #ffffff; }
 
-        .question-text {
-            font-size: 4rem;
-            font-weight: 900;
-            color: #11142a;
-            margin-top: 10px;
-        }
+        .question-text { font-size: 3.5rem; font-weight: 900; color: #11142a; text-align: center; }
+        .mode-tag { background: #f1f5f9; padding: 4px 12px; border-radius: 12px; font-size: 0.75rem; font-weight: 800; color: #475569; border: 1.5px solid #11142a; }
 
-        .input-box-wrapper { width: 100%; max-width: 280px; }
-
-        #answer-input {
-            width: 100%;
-            padding: 14px;
-            font-size: 2rem;
-            background: #ffffff;
-            border: 3px solid #11142a;
-            color: #11142a;
-            border-radius: 18px;
-            text-align: center;
-            outline: none;
-            font-weight: 900;
+        /* Buttons & Controls */
+        .action-button {
+            background: #7c3aed; color: #ffffff; border: 3px solid #11142a;
+            padding: 12px; font-size: 1.2rem; font-weight: 900; border-radius: 16px;
+            cursor: pointer; width: 100%; max-width: 260px; box-shadow: 0 5px 0px #11142a; transition: 0.1s;
         }
+        .action-button:active { transform: translateY(3px); box-shadow: 0 2px 0px #11142a; }
 
-        .submit-btn {
-            background: #7c3aed;
-            color: #ffffff;
-            border: 3px solid #11142a;
-            padding: 14px;
-            font-size: 1.3rem;
-            font-weight: 900;
-            border-radius: 18px;
-            cursor: pointer;
-            width: 100%;
-            max-width: 280px;
-            box-shadow: 0 6px 0px #11142a;
-            transition: 0.1s;
-        }
+        .bottom-controls { display: flex; gap: 10px; width: 100%; justify-content: center; }
 
-        .submit-btn:active {
-            transform: translateY(4px);
-            box-shadow: 0 2px 0px #11142a;
+        .pill-btn {
+            background: #ffffff; color: #11142a; border: 2px solid #cbd5e1;
+            padding: 10px 18px; font-size: 0.85rem; font-weight: 800; border-radius: 20px;
+            cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 3px 0px #cbd5e1;
         }
+        .pill-btn:active { transform: translateY(2px); box-shadow: 0 1px 0px #cbd5e1; }
 
-        .new-game-btn {
-            background: #ffffff;
-            color: #11142a;
-            border: 2px solid #cbd5e1;
-            padding: 12px 30px;
-            font-size: 1rem;
-            font-weight: 800;
-            border-radius: 30px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-            transition: 0.2s;
-        }
-
-        .new-game-btn:active {
-            transform: scale(0.95);
-            background: #f8fafc;
-        }
+        .leaderboard-banner { font-size: 0.8rem; font-weight: 800; color: #475569; background: #ffffff; padding: 6px 14px; border-radius: 12px; border: 2px solid #11142a; width: 100%; text-align: center; }
 
         .flex { display: flex !important; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
+    <div class="overlay" id="name-overlay">
+        <div class="overlay-card">
+            <div class="overlay-title">Enter Your Arena Name</div>
+            <input type="text" id="player-name-input" class="global-input" placeholder="Your Name..." maxlength="12">
+            <button class="action-button" id="save-name-btn">Battle Start</button>
+        </div>
+    </div>
+
     <div class="screen-wrapper">
+        <div class="leaderboard-banner" id="top-rank-banner">🏆 Monthly #1: Checking...</div>
+
         <div class="stats-bar">
             <div class="stat-item"><div class="stat-icon icon-purple">📈</div><div class="stat-text"><span class="stat-label">Level</span><span id="level-val" class="stat-value">1</span></div></div>
             <div class="stat-item"><div class="stat-icon icon-green">🏆</div><div class="stat-text"><span class="stat-label">Score</span><span id="score-val" class="stat-value">0</span></div></div>
@@ -231,11 +200,17 @@
             <div class="game-card" id="interactive-card">
                 
                 <div class="flash-content flex" id="main-play-content">
+                    <span class="mode-tag" id="current-mode-tag">Infinite Addition</span>
                     <div class="question-text" id="display-question">0 + 0</div>
-                    <div class="input-box-wrapper">
-                        <input type="number" id="answer-input" placeholder="?" inputmode="numeric">
+                    <div style="width: 100%; max-width: 260px;">
+                        <input type="number" id="answer-input" class="global-input" style="margin-bottom:0;" placeholder="?" inputmode="numeric">
                     </div>
-                    <button class="submit-btn" id="submit-answer-btn">Submit</button>
+                    <button class="action-button" id="submit-answer-btn">Submit</button>
+                </div>
+
+                <div class="flash-content" id="multiplayer-searching">
+                    <div class="question-text" style="font-size:1.8rem;">Searching Opponent...</div>
+                    <div class="mode-tag">Global Arena 1v1</div>
                 </div>
 
                 <div class="flash-content" id="correct-flash-content">
@@ -251,37 +226,104 @@
             </div>
         </div>
 
-        <button class="new-game-btn" id="new-game-trigger">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
-            New Game
-        </button>
+        <div class="bottom-controls">
+            <button class="pill-btn" id="switch-mode-trigger">🔄 Switch Mode</button>
+            <button class="pill-btn" id="new-game-trigger" style="border-color:#ea580c; color:#ea580c; box-shadow:0 3px 0px #ffedd5;">🆕 New Game</button>
+        </div>
     </div>
 
     <script>
+        const nameOverlay = document.getElementById('name-overlay');
+        const playerNameInput = document.getElementById('player-name-input');
+        const saveNameBtn = document.getElementById('save-name-btn');
+        const topRankBanner = document.getElementById('top-rank-banner');
+        
         const interactiveCard = document.getElementById('interactive-card');
         const mainPlayContent = document.getElementById('main-play-content');
+        const multiplayerSearching = document.getElementById('multiplayer-searching');
         const correctFlashContent = document.getElementById('correct-flash-content');
         const wrongFlashContent = document.getElementById('wrong-flash-content');
+        
         const displayQuestion = document.getElementById('display-question');
         const answerInput = document.getElementById('answer-input');
-        const submitAnswerBtn = document.getElementById('submit-answer-btn');
-        const newGameTrigger = document.getElementById('new-game-trigger');
+        const currentModeTag = document.getElementById('current-mode-tag');
         
-        let score = 0, streak = 0, level = 1, num1 = 0, num2 = 0, correctAnswer = 0;
+        const submitAnswerBtn = document.getElementById('submit-answer-btn');
+        const switchModeTrigger = document.getElementById('switch-mode-trigger');
+        const newGameTrigger = document.getElementById('new-game-trigger');
+
+        let score = 0, streak = 0, level = 1, num1 = 0, num2 = 0, correctAnswer = 0, currentMode = 0; // 0: Addition, 1: Mixed, 2: Online 1v1 Simulation
+        let playerName = "";
+
+        // Monthly High Score System (Persistent via LocalStorage)
+        function checkMonthlyLeaderboard() {
+            let topUser = localStorage.getItem('monthlyTopUser') || "AlphaPro";
+            let topScore = localStorage.getItem('monthlyTopScore') || 45;
+            topRankBanner.innerText = `🏆 Monthly #1: ${topUser} (${topScore} pts)`;
+        }
+
+        saveNameBtn.addEventListener('click', () => {
+            if(playerNameInput.value.trim() !== "") {
+                playerName = playerNameInput.value.trim();
+                nameOverlay.classList.add('hidden');
+                generateQuestion();
+            }
+        });
 
         function updateUiStats() {
             document.getElementById('score-val').innerText = score;
             document.getElementById('streak-val').innerText = streak;
             document.getElementById('level-val').innerText = level;
+            
+            let currentHighScore = parseInt(localStorage.getItem('monthlyTopScore') || 45);
+            if(score > currentHighScore) {
+                localStorage.setItem('monthlyTopScore', score);
+                localStorage.setItem('monthlyTopUser', playerName);
+                checkMonthlyLeaderboard();
+            }
         }
 
         function generateQuestion() {
             answerInput.value = ''; answerInput.focus();
-            num1 = Math.floor(Math.random() * 12) + 2;
-            num2 = Math.floor(Math.random() * 12) + 1;
-            correctAnswer = num1 + num2; 
-            displayQuestion.innerText = num1 + " + " + num2;
+            
+            // Dynamic Difficulty Logic (Mixes Easy and Hard Infinite Loops)
+            let difficultyRange = Math.min(5 + (level * 4), 60); 
+            let isLuckyEasy = (Math.random() > 0.75); 
+            if(isLuckyEasy) difficultyRange = Math.max(5, difficultyRange - 15);
+
+            num1 = Math.floor(Math.random() * difficultyRange) + 2;
+            num2 = Math.floor(Math.random() * difficultyRange) + 1;
+
+            if (currentMode === 0) {
+                currentModeTag.innerText = "Infinite Addition";
+                correctAnswer = num1 + num2;
+                displayQuestion.innerText = `${num1} + ${num2}`;
+            } else if (currentMode === 1) {
+                currentModeTag.innerText = "Mixed Arena";
+                const ops = ['+', '-', '*'];
+                const selectedOp = ops[Math.floor(Math.random() * ops.length)];
+                if(selectedOp === '+') { correctAnswer = num1 + num2; displayQuestion.innerText = `${num1} + ${num2}`; }
+                if(selectedOp === '-') { if(num1 < num2) { let t = num1; num1 = num2; num2 = t; } correctAnswer = num1 - num2; displayQuestion.innerText = `${num1} - ${num2}`; }
+                if(selectedOp === '*') { num1 = Math.floor(Math.random() * 9) + 2; num2 = Math.floor(Math.random() * 9) + 1; correctAnswer = num1 * num2; displayQuestion.innerText = `${num1} × ${num2}`; }
+            }
         }
+
+        // Mode Switching
+        switchModeTrigger.addEventListener('click', () => {
+            currentMode = (currentMode + 1) % 3;
+            if(currentMode === 2) {
+                mainPlayContent.classList.remove('flex');
+                multiplayerSearching.classList.add('flex');
+                setTimeout(() => {
+                    multiplayerSearching.classList.remove('flex');
+                    mainPlayContent.classList.add('flex');
+                    currentMode = 1; // Switches fallback to mixed arena mode challenge after pairing sim
+                    generateQuestion();
+                }, 2000);
+            } else {
+                generateQuestion();
+            }
+        });
 
         newGameTrigger.addEventListener('click', () => {
             score = 0; streak = 0; level = 1;
@@ -298,26 +340,26 @@
                 updateUiStats();
 
                 mainPlayContent.classList.remove('flex');
-                correctFlashContent.classList.add('flex', 'animate-bounce-jump');
+                correctFlashContent.classList.add('flex', 'animate-zoom-success');
                 interactiveCard.classList.add('correct-state');
 
                 setTimeout(() => {
                     interactiveCard.classList.remove('correct-state');
-                    correctFlashContent.classList.remove('flex', 'animate-bounce-jump');
+                    correctFlashContent.classList.remove('flex', 'animate-zoom-success');
                     mainPlayContent.classList.add('flex');
                     generateQuestion();
                 }, 1100);
             } else {
-                streak = 0; 
+                streak = 0;
                 updateUiStats();
 
                 mainPlayContent.classList.remove('flex');
-                wrongFlashContent.classList.add('flex', 'animate-bounce-jump');
+                wrongFlashContent.classList.add('flex', 'animate-zoom-fail');
                 interactiveCard.classList.add('wrong-state');
 
                 setTimeout(() => {
                     interactiveCard.classList.remove('wrong-state');
-                    wrongFlashContent.classList.remove('flex', 'animate-bounce-jump');
+                    wrongFlashContent.classList.remove('flex', 'animate-zoom-fail');
                     mainPlayContent.classList.add('flex');
                     generateQuestion();
                 }, 1300);
@@ -326,7 +368,7 @@
 
         submitAnswerBtn.addEventListener('click', runEvaluationCheck);
         answerInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') runEvaluationCheck(); });
-        generateQuestion();
+        checkMonthlyLeaderboard();
     </script>
 </body>
 </html>
