@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Math Puzzle Arena Pro</title>
+    <title>Math Puzzle Arena Lite</title>
     <style>
         * {
             box-sizing: border-box;
@@ -31,6 +31,7 @@
             gap: 20px;
         }
 
+        /* Stats Bar */
         .stats-bar {
             width: 100%;
             display: flex;
@@ -49,6 +50,7 @@
             font-size: 14px;
         }
 
+        /* Puzzle Box with Dotted Grid */
         .puzzle-box {
             width: 100%;
             background: #1E1E1E;
@@ -119,6 +121,7 @@
             box-shadow: 0 0px 0 #000;
         }
 
+        /* Controls Style */
         .control-btns {
             width: 100%;
             display: flex;
@@ -126,14 +129,8 @@
             gap: 10px;
         }
 
-        .row-btns {
-            width: 100%;
-            display: flex;
-            gap: 10px;
-        }
-
         .action-btn {
-            flex: 1;
+            width: 100%;
             padding: 14px;
             border: 2px solid #333;
             border-radius: 14px;
@@ -155,13 +152,7 @@
             box-shadow: 0 0px 0 #000;
         }
 
-        .action-btn:disabled {
-            opacity: 0.3 !important;
-            cursor: not-allowed;
-            box-shadow: none;
-            transform: none;
-        }
-
+        /* Feedback Overlay Styling */
         .feedback-overlay {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -175,6 +166,7 @@
         .feedback-icon { font-size: 60px; margin-bottom: 10px; }
         .feedback-text { font-size: 24px; font-weight: 800; }
 
+        /* Modals Menu UI */
         .modal {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -195,8 +187,6 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
-            max-height: 85vh;
-            overflow-y: auto;
         }
 
         .menu-btn {
@@ -212,105 +202,13 @@
             text-align: left;
         }
         .menu-btn.active-mode { background: #7C3AED; border-color: #A855F7; }
-
-        .rank-list {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            margin-top: 10px;
-        }
-        .rank-item {
-            display: flex;
-            justify-content: space-between;
-            background: #121212;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 13px;
-            border: 1px solid #333;
-            align-items: center;
-        }
-        .rank-number { font-weight: bold; color: #FBBF24; }
-
         .divider { height: 2px; background: #333; margin: 4px 0; }
-
-        .emoji-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 10px;
-            margin: 10px 0;
-        }
-        .emoji-option {
-            font-size: 28px;
-            padding: 8px;
-            background: #121212;
-            border: 2px solid #333;
-            border-radius: 12px;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.1s ease;
-        }
-        .emoji-option.selected {
-            border-color: #A855F7;
-            background: #2D1F3D;
-        }
-
-        .name-container {
-            background: #1E1E1E;
-            padding: 30px 20px;
-            border-radius: 24px;
-            border: 3px solid #333;
-            text-align: center;
-            width: 90%;
-            max-width: 350px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            box-shadow: 0 8px 0 #000;
-        }
-        
-        .alert-error {
-            color: #FF4A4A;
-            font-size: 14px;
-            font-weight: 700;
-            display: none;
-            background: #2A1616;
-            padding: 12px;
-            border: 2px solid #FF4A4A;
-            border-radius: 12px;
-            text-align: center;
-            box-shadow: inset 0 0 10px rgba(255, 74, 74, 0.2);
-        }
 
         @keyframes burst { 0% { transform: scale(0.7); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-8px); } 40%, 80% { transform: translateX(8px); } }
     </style>
 </head>
 <body>
-
-    <div id="name-setup-screen" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); display:flex; justify-content:center; align-items:center; z-index:200; display:none;">
-        <div class="name-container">
-            <h2 id="profile-title">🎮 Create Profile</h2>
-            <p style="color:#AAA; font-size:14px;">Select an avatar and a unique name.</p>
-            
-            <div class="emoji-grid" id="emoji-picker-grid">
-                <div class="emoji-option selected" data-emoji="🥷">🥷</div>
-                <div class="emoji-option" data-emoji="🚀">🚀</div>
-                <div class="emoji-option" data-emoji="🦊">🦊</div>
-                <div class="emoji-option" data-emoji="🤖">🤖</div>
-                <div class="emoji-option" data-emoji="🎮">🎮</div>
-                <div class="emoji-option" data-emoji="🦁">🦁</div>
-                <div class="emoji-option" data-emoji="👻">👻</div>
-                <div class="emoji-option" data-emoji="🐱">🐱</div>
-                <div class="emoji-option" data-emoji="🧙">🧙</div>
-                <div class="emoji-option" data-emoji="💎">💎</div>
-            </div>
-
-            <input type="text" id="username-input" class="input-box" placeholder="Enter Name..." style="width:100%; height: 50px; font-size: 20px;">
-            <div class="alert-error" id="name-error-msg">⚠️ This name is already taken by a top ranker! Try another name.</div>
-            <button class="submit-btn" id="save-name-btn" style="width:100%;">Save & Play</button>
-            <button class="menu-btn" id="cancel-profile-btn" style="text-align:center; color:#AAA; display:none; background:transparent; border-color:transparent;">Cancel</button>
-        </div>
-    </div>
 
     <div class="game-container">
         <div class="stats-bar">
@@ -332,11 +230,8 @@
         </div>
 
         <div class="control-btns">
-            <button class="action-btn" id="switch-btn" style="width: 100%;">⚙ Switch Mode Menu</button>
-            <div class="row-btns">
-                <button class="action-btn" id="new-game-btn" style="background: #2D1A1A; border-color: #EF4444;">🔄 New Game</button>
-                <button class="action-btn" id="old-game-btn" style="background: #192D1A; border-color: #10B981;" disabled>💾 Old Game</button>
-            </div>
+            <button class="action-btn" id="switch-btn">⚙ Switch Mode Menu</button>
+            <button class="action-btn" id="new-game-btn" style="background: #2D1A1A; border-color: #EF4444;">🔄 New Game</button>
         </div>
     </div>
 
@@ -344,43 +239,25 @@
         <div class="modal-content">
             <h3 style="text-align:center; color:#FBBF24; margin-bottom:5px;">🎮 GAME MODES</h3>
             <div class="divider"></div>
+            
             <button class="menu-btn active-mode" id="mode-add">➕ Infinite Addition</button>
             <button class="menu-btn" id="mode-sub">➖ Sub Penalty</button>
             <button class="menu-btn" id="mode-mul">✖ Multiply Master</button>
             <button class="menu-btn" id="mode-div">➗ Divide Arena</button>
             <button class="menu-btn" id="mode-mix">🔀 Mixed Arena (+, -, ×, ÷)</button>
+            
             <div class="divider"></div>
-            <button class="menu-btn" id="btn-edit-profile" style="border-color: #A855F7; color: #A855F7; text-align: center; background: #1E1E1E;">✏️ Edit Profile Name/Emoji</button>
-            <button class="menu-btn" id="btn-open-leaderboard" style="border-color: #06B6D4; color: #06B6D4; text-align: center; background: #1E1E1E;">🏆 View Leaderboard (Top 100)</button>
-            <button class="menu-btn" id="btn-close-mode" style="text-align:center; color:#AAA;">❌ Close</button>
-        </div>
-    </div>
-
-    <div class="modal" id="leaderboard-modal">
-        <div class="modal-content">
-            <h3 style="text-align:center; color:#FBBF24;">👑 LEADERBOARD RANKINGS</h3>
-            <p style="font-size:12px; text-align:center; color:#AAA;">Your High Streak: <span id="user-high-streak">0</span></p>
-            <div class="divider"></div>
-            <div class="rank-list" id="leaderboard-rank-container"></div>
-            <div class="divider"></div>
-            <button class="menu-btn" id="btn-close-leaderboard" style="text-align:center; color:#EF4444; background:#121212;">⬅ Back To Modes</button>
+            <button class="menu-btn" id="btn-close-mode" style="text-align:center; color:#AAA; background:#121212;">❌ Close</button>
         </div>
     </div>
 
     <script>
-        // Game States
-        let playerName = "Guest";
-        let playerEmoji = "🥷";
+        // Game Logic States
         let currentLevel = 1;
         let currentScore = 0;
         let currentStreak = 0;
-        let highestStreak = 0;
         let gameMode = 'addition'; 
         let num1 = 0, num2 = 0, currentOperator = '+';
-        let activeSession = 'new_game'; 
-
-        const mockNames = ["Rohan Kumar", "Aman Singh", "Vikram Das", "Priya Sharma", "Rajesh Yadav", "Sanjay Pal", "Nitin Verma", "Deepak Jha", "Anjali Neogi", "Rahul Dev"];
-        const mockEmojis = ["🚀", "🦊", "🤖", "🎮", "🦁", "👻", "🐱", "🧙", "💎"];
 
         const levelVal = document.getElementById('level-val');
         const scoreVal = document.getElementById('score-val');
@@ -389,105 +266,25 @@
         const answerInput = document.getElementById('answer-input');
         const submitBtn = document.getElementById('submit-btn');
         const newGameBtn = document.getElementById('new-game-btn');
-        const oldGameBtn = document.getElementById('old-game-btn');
         const switchBtn = document.getElementById('switch-btn');
-        
         const modeModal = document.getElementById('mode-modal');
-        const leaderboardModal = document.getElementById('leaderboard-modal');
         const modeDisplayTag = document.getElementById('mode-display-tag');
-        const leaderboardRankContainer = document.getElementById('leaderboard-rank-container');
-        const userHighStreakText = document.getElementById('user-high-streak');
-        const nameErrorMsg = document.getElementById('name-error-msg');
         
         const feedbackOverlay = document.getElementById('feedback-overlay');
         const feedbackIcon = document.getElementById('feedback-icon');
         const feedbackText = document.getElementById('feedback-text');
 
-        const nameSetupScreen = document.getElementById('name-setup-screen');
-        const usernameInput = document.getElementById('username-input');
-        const saveNameBtn = document.getElementById('save-name-btn');
-        const cancelProfileBtn = document.getElementById('cancel-profile-btn');
-        const profileTitle = document.getElementById('profile-title');
-
-        document.querySelectorAll('.emoji-option').forEach(item => {
-            item.onclick = function() {
-                document.querySelectorAll('.emoji-option').forEach(el => el.classList.remove('selected'));
-                item.classList.add('selected');
-                playerEmoji = item.getAttribute('data-emoji');
-            };
-        });
-
         window.onload = function() {
-            const savedName = localStorage.getItem('puzzle_player_name');
-            highestStreak = parseInt(localStorage.getItem('puzzle_high_streak')) || 0;
-
-            if (!savedName) {
-                profileTitle.innerText = "🎮 Create Profile";
-                cancelProfileBtn.style.display = 'none';
-                nameSetupScreen.style.display = 'flex';
-            } else {
-                playerName = savedName;
-                playerEmoji = localStorage.getItem('puzzle_player_emoji') || "🥷";
-                checkOldGameButtonStatus();
-                setupCleanBoardNoSave();
-            }
+            resetGameBoard();
         };
 
-        function checkOldGameButtonStatus() {
-            if(localStorage.getItem('puzzle_saved_game') === 'true') {
-                oldGameBtn.disabled = false;
-            } else {
-                oldGameBtn.disabled = true;
-            }
+        function resetGameBoard() {
+            currentLevel = 1;
+            currentScore = 0;
+            currentStreak = 0;
+            updateUI();
+            generateQuestion();
         }
-
-        document.getElementById('btn-edit-profile').onclick = function() {
-            modeModal.classList.remove('active');
-            profileTitle.innerText = "✏️ Edit Profile";
-            usernameInput.value = playerName;
-            document.querySelectorAll('.emoji-option').forEach(el => {
-                if(el.getAttribute('data-emoji') === playerEmoji) el.classList.add('selected');
-                else el.classList.remove('selected');
-            });
-            nameErrorMsg.style.display = 'none';
-            cancelProfileBtn.style.display = 'block';
-            nameSetupScreen.style.display = 'flex';
-        };
-
-        cancelProfileBtn.onclick = () => nameSetupScreen.style.display = 'none';
-
-        saveNameBtn.onclick = function() {
-            const typedName = usernameInput.value.trim();
-            if(typedName === "") return;
-
-            const nameExists = mockNames.some(name => name.toLowerCase() === typedName.toLowerCase());
-            if (nameExists) {
-                nameErrorMsg.style.display = 'block';
-                return;
-            }
-
-            nameErrorMsg.style.display = 'none';
-            playerName = typedName;
-            localStorage.setItem('puzzle_player_name', playerName);
-            localStorage.setItem('puzzle_player_emoji', playerEmoji);
-            nameSetupScreen.style.display = 'none';
-            
-            setupCleanBoardNoSave();
-        };
-
-        oldGameBtn.onclick = function() {
-            if(localStorage.getItem('puzzle_saved_game') === 'true') {
-                activeSession = 'old_game';
-                currentLevel = parseInt(localStorage.getItem('puzzle_lvl')) || 1;
-                currentScore = parseInt(localStorage.getItem('puzzle_scr')) || 0;
-                currentStreak = parseInt(localStorage.getItem('puzzle_stk')) || 0;
-                gameMode = localStorage.getItem('puzzle_mode') || 'addition';
-                
-                setActiveModeVisual(gameMode);
-                updateUI();
-                generateQuestion();
-            }
-        };
 
         function generateQuestion() {
             if (gameMode === 'addition') currentOperator = '+';
@@ -499,6 +296,7 @@
                 currentOperator = ops[Math.floor(Math.random() * ops.length)];
             }
 
+            // Math Ranges depending on Level
             if (currentOperator === '+' || currentOperator === '-') {
                 if (currentLevel === 1) {
                     num1 = Math.floor(Math.random() * 10) + 3; 
@@ -557,37 +355,17 @@
             if (playerAns === correctAns) {
                 currentScore += 1;
                 currentStreak += 1;
-                if (currentScore % 4 === 0) currentLevel += 1;
-
-                if (currentStreak > highestStreak) {
-                    highestStreak = currentStreak;
-                    localStorage.setItem('puzzle_high_streak', highestStreak);
+                
+                // Fast Level Up logic: Every 2 correct answers jumps a level
+                if (currentScore % 2 === 0) {
+                    currentLevel += 1;
                 }
                 showFeedback(true);
             } else {
                 currentStreak = 0; 
                 showFeedback(false);
             }
-            
-            updateUIAndStorage();
-        }
-
-        function updateUIAndStorage() {
             updateUI();
-            
-            if (activeSession === 'old_game') {
-                localStorage.setItem('puzzle_saved_game', 'true');
-                localStorage.setItem('puzzle_lvl', currentLevel);
-                localStorage.setItem('puzzle_scr', currentScore);
-                localStorage.setItem('puzzle_stk', currentStreak);
-                localStorage.setItem('puzzle_mode', gameMode);
-            } else {
-                localStorage.setItem('puzzle_newgame_lvl', currentLevel);
-                localStorage.setItem('puzzle_newgame_scr', currentScore);
-                localStorage.setItem('puzzle_newgame_stk', currentStreak);
-                localStorage.setItem('puzzle_newgame_mode', gameMode);
-            }
-            checkOldGameButtonStatus();
         }
 
         function updateUI() {
@@ -609,20 +387,9 @@
             }, 900);
         }
 
-        function setupCleanBoardNoSave() {
-            activeSession = 'new_game';
-            currentLevel = 1;
-            currentScore = 0;
-            currentStreak = 0;
-            updateUI();
-            checkOldGameButtonStatus();
-            generateQuestion();
-        }
-
         function selectMode(mode) {
             gameMode = mode;
             setActiveModeVisual(mode);
-            updateUIAndStorage();
             generateQuestion();
             modeModal.classList.remove('active');
         }
@@ -637,37 +404,7 @@
             }
         }
 
-        function buildLeaderboardUI() {
-            userHighStreakText.innerText = highestStreak;
-            leaderboardRankContainer.innerHTML = "";
-
-            let htmlStr = `<div class="rank-item" style="border-color:#FBBF24; background:#2D2114;">
-                <span class="rank-number">🥇 Rank 1</span>
-                <span>${playerEmoji} <b>${playerName} (You)</b></span>
-                <span style="color:#FBBF24;">⚡ ${highestStreak} Streak</span>
-            </div>`;
-
-            let baseScore = Math.max(highestStreak + 10, 20);
-
-            for (let i = 2; i <= 100; i++) {
-                let currentRankName = mockNames[(i % mockNames.length)];
-                let currentRankEmoji = mockEmojis[(i % mockEmojis.length)];
-                baseScore = baseScore - (Math.floor(Math.random() * 2) === 0 ? 1 : 0);
-                if(baseScore < 0) baseScore = 0;
-
-                let medal = `Rank ${i}`;
-                if(i === 2) medal = "🥈 Rank 2";
-                if(i === 3) medal = "🥉 Rank 3";
-
-                htmlStr += `<div class="rank-item">
-                    <span class="rank-number">${medal}</span>
-                    <span>${currentRankEmoji} ${currentRankName}</span>
-                    <span style="color:#AAA;">⚡ ${baseScore} Streak</span>
-                </div>`;
-            }
-            leaderboardRankContainer.innerHTML = htmlStr;
-        }
-
+        // Click Controls
         document.getElementById('mode-add').onclick = () => selectMode('addition');
         document.getElementById('mode-sub').onclick = () => selectMode('subtraction');
         document.getElementById('mode-mul').onclick = () => selectMode('multiplication');
@@ -677,19 +414,8 @@
         submitBtn.onclick = checkAnswer;
         answerInput.onkeydown = (e) => { if (e.key === 'Enter') checkAnswer(); };
         switchBtn.onclick = () => modeModal.classList.add('active');
-        
         document.getElementById('btn-close-mode').onclick = () => modeModal.classList.remove('active');
-        document.getElementById('btn-open-leaderboard').onclick = () => {
-            buildLeaderboardUI();
-            modeModal.classList.remove('active');
-            leaderboardModal.classList.add('active');
-        };
-        document.getElementById('btn-close-leaderboard').onclick = () => {
-            leaderboardModal.classList.remove('active');
-            modeModal.classList.add('active');
-        };
-        
-        newGameBtn.onclick = setupCleanBoardNoSave;
+        newGameBtn.onclick = resetGameBoard;
     </script>
 </body>
 </html>
