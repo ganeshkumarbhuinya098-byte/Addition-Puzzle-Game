@@ -31,7 +31,6 @@
             gap: 20px;
         }
 
-        /* Stats Bar */
         .stats-bar {
             width: 100%;
             display: flex;
@@ -50,7 +49,6 @@
             font-size: 14px;
         }
 
-        /* Puzzle Box with Dotted Grid */
         .puzzle-box {
             width: 100%;
             background: #1E1E1E;
@@ -121,7 +119,6 @@
             box-shadow: 0 0px 0 #000;
         }
 
-        /* Bottom Controls Grid Style */
         .control-btns {
             width: 100%;
             display: flex;
@@ -158,7 +155,6 @@
             box-shadow: 0 0px 0 #000;
         }
 
-        /* Disabled State styling for Old game button */
         .action-btn:disabled {
             opacity: 0.3 !important;
             cursor: not-allowed;
@@ -166,7 +162,6 @@
             transform: none;
         }
 
-        /* Feedback Overlay Styling */
         .feedback-overlay {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -180,7 +175,6 @@
         .feedback-icon { font-size: 60px; margin-bottom: 10px; }
         .feedback-text { font-size: 24px; font-weight: 800; }
 
-        /* Modals Menu UI */
         .modal {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -219,7 +213,6 @@
         }
         .menu-btn.active-mode { background: #7C3AED; border-color: #A855F7; }
 
-        /* Leaderboard Box List */
         .rank-list {
             display: flex;
             flex-direction: column;
@@ -240,7 +233,6 @@
 
         .divider { height: 2px; background: #333; margin: 4px 0; }
 
-        /* Emoji Profile Selector */
         .emoji-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
@@ -314,9 +306,7 @@
             </div>
 
             <input type="text" id="username-input" class="input-box" placeholder="Enter Name..." style="width:100%; height: 50px; font-size: 20px;">
-            
             <div class="alert-error" id="name-error-msg">⚠️ This name is already taken by a top ranker! Try another name.</div>
-            
             <button class="submit-btn" id="save-name-btn" style="width:100%;">Save & Play</button>
             <button class="menu-btn" id="cancel-profile-btn" style="text-align:center; color:#AAA; display:none; background:transparent; border-color:transparent;">Cancel</button>
         </div>
@@ -354,13 +344,11 @@
         <div class="modal-content">
             <h3 style="text-align:center; color:#FBBF24; margin-bottom:5px;">🎮 GAME MODES</h3>
             <div class="divider"></div>
-            
             <button class="menu-btn active-mode" id="mode-add">➕ Infinite Addition</button>
             <button class="menu-btn" id="mode-sub">➖ Sub Penalty</button>
             <button class="menu-btn" id="mode-mul">✖ Multiply Master</button>
             <button class="menu-btn" id="mode-div">➗ Divide Arena</button>
             <button class="menu-btn" id="mode-mix">🔀 Mixed Arena (+, -, ×, ÷)</button>
-            
             <div class="divider"></div>
             <button class="menu-btn" id="btn-edit-profile" style="border-color: #A855F7; color: #A855F7; text-align: center; background: #1E1E1E;">✏️ Edit Profile Name/Emoji</button>
             <button class="menu-btn" id="btn-open-leaderboard" style="border-color: #06B6D4; color: #06B6D4; text-align: center; background: #1E1E1E;">🏆 View Leaderboard (Top 100)</button>
@@ -373,15 +361,14 @@
             <h3 style="text-align:center; color:#FBBF24;">👑 LEADERBOARD RANKINGS</h3>
             <p style="font-size:12px; text-align:center; color:#AAA;">Your High Streak: <span id="user-high-streak">0</span></p>
             <div class="divider"></div>
-            
             <div class="rank-list" id="leaderboard-rank-container"></div>
-
             <div class="divider"></div>
             <button class="menu-btn" id="btn-close-leaderboard" style="text-align:center; color:#EF4444; background:#121212;">⬅ Back To Modes</button>
         </div>
     </div>
 
     <script>
+        // Game States
         let playerName = "Guest";
         let playerEmoji = "🥷";
         let currentLevel = 1;
@@ -390,7 +377,7 @@
         let highestStreak = 0;
         let gameMode = 'addition'; 
         let num1 = 0, num2 = 0, currentOperator = '+';
-        let isGameStartedAndPlayed = false; // Safe lock checker flag
+        let activeSession = 'new_game'; 
 
         const mockNames = ["Rohan Kumar", "Aman Singh", "Vikram Das", "Priya Sharma", "Rajesh Yadav", "Sanjay Pal", "Nitin Verma", "Deepak Jha", "Anjali Neogi", "Rahul Dev"];
         const mockEmojis = ["🚀", "🦊", "🤖", "🎮", "🦁", "👻", "🐱", "🧙", "💎"];
@@ -488,14 +475,13 @@
             setupCleanBoardNoSave();
         };
 
-        // Old Game click trigger logic
         oldGameBtn.onclick = function() {
             if(localStorage.getItem('puzzle_saved_game') === 'true') {
+                activeSession = 'old_game';
                 currentLevel = parseInt(localStorage.getItem('puzzle_lvl')) || 1;
                 currentScore = parseInt(localStorage.getItem('puzzle_scr')) || 0;
                 currentStreak = parseInt(localStorage.getItem('puzzle_stk')) || 0;
                 gameMode = localStorage.getItem('puzzle_mode') || 'addition';
-                isGameStartedAndPlayed = true;
                 
                 setActiveModeVisual(gameMode);
                 updateUI();
@@ -562,9 +548,6 @@
             const playerAns = parseInt(answerInput.value);
             if (isNaN(playerAns)) return;
 
-            // Safe lock opens because user plays an active turn right now
-            isGameStartedAndPlayed = true;
-
             let correctAns;
             if (currentOperator === '+') correctAns = num1 + num2;
             else if (currentOperator === '-') correctAns = num1 - num2;
@@ -586,20 +569,25 @@
                 showFeedback(false);
             }
             
-            // Only saves to device memory when turn actually completes
             updateUIAndStorage();
         }
 
         function updateUIAndStorage() {
             updateUI();
-            if(isGameStartedAndPlayed) {
+            
+            if (activeSession === 'old_game') {
                 localStorage.setItem('puzzle_saved_game', 'true');
                 localStorage.setItem('puzzle_lvl', currentLevel);
                 localStorage.setItem('puzzle_scr', currentScore);
                 localStorage.setItem('puzzle_stk', currentStreak);
                 localStorage.setItem('puzzle_mode', gameMode);
-                checkOldGameButtonStatus();
+            } else {
+                localStorage.setItem('puzzle_newgame_lvl', currentLevel);
+                localStorage.setItem('puzzle_newgame_scr', currentScore);
+                localStorage.setItem('puzzle_newgame_stk', currentStreak);
+                localStorage.setItem('puzzle_newgame_mode', gameMode);
             }
+            checkOldGameButtonStatus();
         }
 
         function updateUI() {
@@ -621,12 +609,11 @@
             }, 900);
         }
 
-        // New Game Reset Board view layout without instantly modifying database records
         function setupCleanBoardNoSave() {
+            activeSession = 'new_game';
             currentLevel = 1;
             currentScore = 0;
             currentStreak = 0;
-            isGameStartedAndPlayed = false; // Lock stays safe until turn plays
             updateUI();
             checkOldGameButtonStatus();
             generateQuestion();
@@ -635,12 +622,7 @@
         function selectMode(mode) {
             gameMode = mode;
             setActiveModeVisual(mode);
-            // Mode changes cleanly on active board layout
-            if(isGameStartedAndPlayed) {
-                updateUIAndStorage();
-            } else {
-                updateUI();
-            }
+            updateUIAndStorage();
             generateQuestion();
             modeModal.classList.remove('active');
         }
