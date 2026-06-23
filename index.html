@@ -252,7 +252,6 @@
     </div>
 
     <script>
-        // Game Logic States
         let currentLevel = 1;
         let currentScore = 0;
         let currentStreak = 0;
@@ -286,6 +285,11 @@
             generateQuestion();
         }
 
+        // Helper to get a truly random number in a range
+        function getRandom(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
         function generateQuestion() {
             if (gameMode === 'addition') currentOperator = '+';
             else if (gameMode === 'subtraction') currentOperator = '-';
@@ -296,45 +300,56 @@
                 currentOperator = ops[Math.floor(Math.random() * ops.length)];
             }
 
-            // Math Ranges depending on Level
+            // --- ADDITION & SUBTRACTION LOGIC ---
             if (currentOperator === '+' || currentOperator === '-') {
-                if (currentLevel === 1) {
-                    num1 = Math.floor(Math.random() * 10) + 3; 
-                    num2 = Math.floor(Math.random() * 10) + 2; 
-                } else if (currentLevel === 2) {
-                    num1 = Math.floor(Math.random() * 15) + 10;
-                    num2 = Math.floor(Math.random() * 15) + 5;
+                if (currentLevel <= 2 && currentScore < 5) {
+                    // Level 1-2 & Score < 5: Easy and random (5 to 15)
+                    num1 = getRandom(5, 15);
+                    num2 = getRandom(3, 12);
+                } else if (currentLevel > 2 && currentScore < 5) {
+                    // Level 3+ but Score < 5: Slightly heavier
+                    num1 = getRandom(15, 30);
+                    num2 = getRandom(10, 25);
                 } else {
-                    let rangeMax = 20 + (currentLevel * 10);
-                    if (rangeMax > 200) rangeMax = 200;
-                    num1 = Math.floor(Math.random() * rangeMax) + 10;
-                    num2 = Math.floor(Math.random() * rangeMax) + 10;
+                    // Super Heavy Explosion (Score >= 5): Challenging but mental-math friendly
+                    num1 = getRandom(35, 75);
+                    num2 = getRandom(20, 50);
                 }
                 if (currentOperator === '-' && num1 < num2) {
                     let temp = num1; num1 = num2; num2 = temp;
                 }
             } 
+            // --- MULTIPLICATION LOGIC ---
             else if (currentOperator === '×') {
-                if (currentLevel <= 2) {
-                    num1 = Math.floor(Math.random() * 7) + 2; 
-                    num2 = Math.floor(Math.random() * 4) + 2; 
+                if (currentLevel <= 2 && currentScore < 5) {
+                    // Level 1-2 & Score < 5: Easy tables (Fresh randoms, no loops)
+                    num1 = getRandom(3, 9);
+                    num2 = getRandom(2, 8);
+                } else if (currentLevel > 2 && currentScore < 5) {
+                    // Level 3+ but Score < 5: Medium tables
+                    num1 = getRandom(7, 12);
+                    num2 = getRandom(4, 9);
                 } else {
-                    num1 = Math.floor(Math.random() * 5) + 8; 
-                    num2 = Math.floor(Math.random() * 8) + 2; 
+                    // Super Heavy Explosion (Score >= 5): Up to 19x9 tables
+                    num1 = getRandom(11, 19);
+                    num2 = getRandom(3, 9);
                 }
             } 
+            // --- DIVISION LOGIC ---
             else if (currentOperator === '➗') {
-                if (currentLevel <= 2) {
-                    let divisor = Math.floor(Math.random() * 5) + 2; 
-                    let quotient = Math.floor(Math.random() * 5) + 2; 
-                    num1 = divisor * quotient; 
-                    num2 = divisor;
+                let divisor, quotient;
+                if (currentLevel <= 2 && currentScore < 5) {
+                    divisor = getRandom(2, 6);
+                    quotient = getRandom(2, 7);
+                } else if (currentLevel > 2 && currentScore < 5) {
+                    divisor = getRandom(4, 9);
+                    quotient = getRandom(4, 9);
                 } else {
-                    let divisor = Math.floor(Math.random() * 7) + 3; 
-                    let quotient = Math.floor(Math.random() * 8) + 3; 
-                    num1 = divisor * quotient;
-                    num2 = divisor;
+                    divisor = getRandom(6, 12);
+                    quotient = getRandom(6, 12);
                 }
+                num1 = divisor * quotient; 
+                num2 = divisor;
             }
 
             questionText.innerHTML = `${num1} <span>${currentOperator}</span> ${num2}`;
@@ -356,7 +371,7 @@
                 currentScore += 1;
                 currentStreak += 1;
                 
-                // Fast Level Up logic: Every 2 correct answers jumps a level
+                // Rules: Every 2 correct answers = Level Up
                 if (currentScore % 2 === 0) {
                     currentLevel += 1;
                 }
@@ -404,18 +419,17 @@
             }
         }
 
-        // Click Controls
-        document.getElementById('mode-add').onclick = () => selectMode('addition');
-        document.getElementById('mode-sub').onclick = () => selectMode('subtraction');
-        document.getElementById('mode-mul').onclick = () => selectMode('multiplication');
-        document.getElementById('mode-div').onclick = () => selectMode('division');
-        document.getElementById('mode-mix').onclick = () => selectMode('mixed');
-
         submitBtn.onclick = checkAnswer;
         answerInput.onkeydown = (e) => { if (e.key === 'Enter') checkAnswer(); };
         switchBtn.onclick = () => modeModal.classList.add('active');
         document.getElementById('btn-close-mode').onclick = () => modeModal.classList.remove('active');
         newGameBtn.onclick = resetGameBoard;
+
+        document.getElementById('mode-add').onclick = () => selectMode('addition');
+        document.getElementById('mode-sub').onclick = () => selectMode('subtraction');
+        document.getElementById('mode-mul').onclick = () => selectMode('multiplication');
+        document.getElementById('mode-div').onclick = () => selectMode('division');
+        document.getElementById('mode-mix').onclick = () => selectMode('mixed');
     </script>
 </body>
 </html>
