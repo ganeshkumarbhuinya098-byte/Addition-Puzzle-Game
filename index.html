@@ -150,11 +150,20 @@
             justify-content: center;
             align-items: center;
             gap: 5px;
+            transition: all 0.2s;
         }
 
         .action-btn:active {
             transform: translateY(4px);
             box-shadow: 0 0px 0 #000;
+        }
+
+        /* Disabled State styling for Old game button */
+        .action-btn:disabled {
+            opacity: 0.3 !important;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
         }
 
         /* Feedback Overlay Styling */
@@ -267,7 +276,6 @@
             box-shadow: 0 8px 0 #000;
         }
         
-        /* Styled Beautiful Red Alert Box for Error Messages */
         .alert-error {
             color: #FF4A4A;
             font-size: 14px;
@@ -337,7 +345,7 @@
             <button class="action-btn" id="switch-btn" style="width: 100%;">⚙ Switch Mode Menu</button>
             <div class="row-btns">
                 <button class="action-btn" id="new-game-btn" style="background: #2D1A1A; border-color: #EF4444;">🔄 New Game</button>
-                <button class="action-btn" id="old-game-btn" style="background: #192D1A; border-color: #10B981;">💾 Old Game</button>
+                <button class="action-btn" id="old-game-btn" style="background: #192D1A; border-color: #10B981;" disabled>💾 Old Game</button>
             </div>
         </div>
     </div>
@@ -366,8 +374,7 @@
             <p style="font-size:12px; text-align:center; color:#AAA;">Your High Streak: <span id="user-high-streak">0</span></p>
             <div class="divider"></div>
             
-            <div class="rank-list" id="leaderboard-rank-container">
-                </div>
+            <div class="rank-list" id="leaderboard-rank-container"></div>
 
             <div class="divider"></div>
             <button class="menu-btn" id="btn-close-leaderboard" style="text-align:center; color:#EF4444; background:#121212;">⬅ Back To Modes</button>
@@ -375,7 +382,6 @@
     </div>
 
     <script>
-        // System States
         let playerName = "Guest";
         let playerEmoji = "🥷";
         let currentLevel = 1;
@@ -384,12 +390,11 @@
         let highestStreak = 0;
         let gameMode = 'addition'; 
         let num1 = 0, num2 = 0, currentOperator = '+';
+        let isGameStartedAndPlayed = false; // Safe lock checker flag
 
-        // 100 Dummy Names List for design testing
         const mockNames = ["Rohan Kumar", "Aman Singh", "Vikram Das", "Priya Sharma", "Rajesh Yadav", "Sanjay Pal", "Nitin Verma", "Deepak Jha", "Anjali Neogi", "Rahul Dev"];
         const mockEmojis = ["🚀", "🦊", "🤖", "🎮", "🦁", "👻", "🐱", "🧙", "💎"];
 
-        // UI Mapping
         const levelVal = document.getElementById('level-val');
         const scoreVal = document.getElementById('score-val');
         const streakVal = document.getElementById('streak-val');
@@ -417,7 +422,6 @@
         const cancelProfileBtn = document.getElementById('cancel-profile-btn');
         const profileTitle = document.getElementById('profile-title');
 
-        // Emoji Selection Handler
         document.querySelectorAll('.emoji-option').forEach(item => {
             item.onclick = function() {
                 document.querySelectorAll('.emoji-option').forEach(el => el.classList.remove('selected'));
@@ -431,59 +435,47 @@
             highestStreak = parseInt(localStorage.getItem('puzzle_high_streak')) || 0;
 
             if (!savedName) {
-                // If opening for very first time
                 profileTitle.innerText = "🎮 Create Profile";
                 cancelProfileBtn.style.display = 'none';
                 nameSetupScreen.style.display = 'flex';
             } else {
                 playerName = savedName;
                 playerEmoji = localStorage.getItem('puzzle_player_emoji') || "🥷";
-                
-                // Old game check logic
-                if(localStorage.getItem('puzzle_saved_game') === 'true') {
-                    // Activate old game button visually
-                    oldGameBtn.style.opacity = "1";
-                } else {
-                    oldGameBtn.style.opacity = "0.5";
-                }
-                
-                // Start a safe clean level 1 fresh game initially
-                startFreshNewGame();
+                checkOldGameButtonStatus();
+                setupCleanBoardNoSave();
             }
         };
 
-        // Open Edit Profile Option from menu Anytime
+        function checkOldGameButtonStatus() {
+            if(localStorage.getItem('puzzle_saved_game') === 'true') {
+                oldGameBtn.disabled = false;
+            } else {
+                oldGameBtn.disabled = true;
+            }
+        }
+
         document.getElementById('btn-edit-profile').onclick = function() {
             modeModal.classList.remove('active');
             profileTitle.innerText = "✏️ Edit Profile";
             usernameInput.value = playerName;
-            
-            // Highlight current selected emoji
             document.querySelectorAll('.emoji-option').forEach(el => {
-                if(el.getAttribute('data-emoji') === playerEmoji) {
-                    el.classList.add('selected');
-                } else {
-                    el.classList.remove('selected');
-                }
+                if(el.getAttribute('data-emoji') === playerEmoji) el.classList.add('selected');
+                else el.classList.remove('selected');
             });
-            
             nameErrorMsg.style.display = 'none';
             cancelProfileBtn.style.display = 'block';
             nameSetupScreen.style.display = 'flex';
         };
 
-        cancelProfileBtn.onclick = function() {
-            nameSetupScreen.style.display = 'none';
-        };
+        cancelProfileBtn.onclick = () => nameSetupScreen.style.display = 'none';
 
         saveNameBtn.onclick = function() {
             const typedName = usernameInput.value.trim();
             if(typedName === "") return;
 
-            // Check if name matches any of the top rank dummy names
             const nameExists = mockNames.some(name => name.toLowerCase() === typedName.toLowerCase());
             if (nameExists) {
-                nameErrorMsg.style.display = 'block'; // Triggers the styled beautiful alert box
+                nameErrorMsg.style.display = 'block';
                 return;
             }
 
@@ -493,24 +485,24 @@
             localStorage.setItem('puzzle_player_emoji', playerEmoji);
             nameSetupScreen.style.display = 'none';
             
-            startFreshNewGame();
+            setupCleanBoardNoSave();
         };
 
-        // Old Game Loader Logic
-        function loadOldGameMemories() {
+        // Old Game click trigger logic
+        oldGameBtn.onclick = function() {
             if(localStorage.getItem('puzzle_saved_game') === 'true') {
                 currentLevel = parseInt(localStorage.getItem('puzzle_lvl')) || 1;
                 currentScore = parseInt(localStorage.getItem('puzzle_scr')) || 0;
                 currentStreak = parseInt(localStorage.getItem('puzzle_stk')) || 0;
                 gameMode = localStorage.getItem('puzzle_mode') || 'addition';
+                isGameStartedAndPlayed = true;
                 
                 setActiveModeVisual(gameMode);
                 updateUI();
                 generateQuestion();
             }
-        }
+        };
 
-        // LEVEL-WISE SLOW PROGRESS LOGIC (Failsafe Difficulty Control)
         function generateQuestion() {
             if (gameMode === 'addition') currentOperator = '+';
             else if (gameMode === 'subtraction') currentOperator = '-';
@@ -521,47 +513,37 @@
                 currentOperator = ops[Math.floor(Math.random() * ops.length)];
             }
 
-            // ➕ ADDITION & ➖ SUBTRACTION LOGIC
             if (currentOperator === '+' || currentOperator === '-') {
                 if (currentLevel === 1) {
-                    // Level 1: Numbers under 15 strictly (Super Easy)
-                    num1 = Math.floor(Math.random() * 10) + 3; // 3 to 12
-                    num2 = Math.floor(Math.random() * 10) + 2; // 2 to 11
+                    num1 = Math.floor(Math.random() * 10) + 3; 
+                    num2 = Math.floor(Math.random() * 10) + 2; 
                 } else if (currentLevel === 2) {
-                    // Level 2: Numbers under 30
                     num1 = Math.floor(Math.random() * 15) + 10;
                     num2 = Math.floor(Math.random() * 15) + 5;
                 } else {
-                    // Level 3 onwards: Slow graduate scale up
-                    let rangeMax = 20 + (currentLevel * 10); // Level 3 = Max 50
-                    if (rangeMax > 200) rangeMax = 200; // Cap it so it never goes into crazy numbers
+                    let rangeMax = 20 + (currentLevel * 10);
+                    if (rangeMax > 200) rangeMax = 200;
                     num1 = Math.floor(Math.random() * rangeMax) + 10;
                     num2 = Math.floor(Math.random() * rangeMax) + 10;
                 }
-
-                // Subtraction safety: Never allow negative answers
                 if (currentOperator === '-' && num1 < num2) {
                     let temp = num1; num1 = num2; num2 = temp;
                 }
             } 
-            // ✖ MULTIPLICATION LOGIC
             else if (currentOperator === '×') {
                 if (currentLevel <= 2) {
-                    // Basic Single digit tables up to 9
-                    num1 = Math.floor(Math.random() * 7) + 2; // 2 to 8
-                    num2 = Math.floor(Math.random() * 4) + 2; // 2 to 5
+                    num1 = Math.floor(Math.random() * 7) + 2; 
+                    num2 = Math.floor(Math.random() * 4) + 2; 
                 } else {
-                    // Slow transition to table of 12-15
                     num1 = Math.floor(Math.random() * 5) + 8; 
                     num2 = Math.floor(Math.random() * 8) + 2; 
                 }
             } 
-            // ➗ DIVISION LOGIC (Always clean perfect numbers, no decimals)
             else if (currentOperator === '➗') {
                 if (currentLevel <= 2) {
-                    let divisor = Math.floor(Math.random() * 5) + 2; // 2 to 6
-                    let quotient = Math.floor(Math.random() * 5) + 2; // 2 to 6
-                    num1 = divisor * quotient; // Perfect Dividend
+                    let divisor = Math.floor(Math.random() * 5) + 2; 
+                    let quotient = Math.floor(Math.random() * 5) + 2; 
+                    num1 = divisor * quotient; 
                     num2 = divisor;
                 } else {
                     let divisor = Math.floor(Math.random() * 7) + 3; 
@@ -580,6 +562,9 @@
             const playerAns = parseInt(answerInput.value);
             if (isNaN(playerAns)) return;
 
+            // Safe lock opens because user plays an active turn right now
+            isGameStartedAndPlayed = true;
+
             let correctAns;
             if (currentOperator === '+') correctAns = num1 + num2;
             else if (currentOperator === '-') correctAns = num1 - num2;
@@ -589,8 +574,6 @@
             if (playerAns === correctAns) {
                 currentScore += 1;
                 currentStreak += 1;
-                
-                // Advance level slowly every 4 correct answers
                 if (currentScore % 4 === 0) currentLevel += 1;
 
                 if (currentStreak > highestStreak) {
@@ -599,20 +582,24 @@
                 }
                 showFeedback(true);
             } else {
-                currentStreak = 0; // Streak breaks on wrong answer
+                currentStreak = 0; 
                 showFeedback(false);
             }
+            
+            // Only saves to device memory when turn actually completes
             updateUIAndStorage();
         }
 
         function updateUIAndStorage() {
             updateUI();
-            localStorage.setItem('puzzle_saved_game', 'true');
-            localStorage.setItem('puzzle_lvl', currentLevel);
-            localStorage.setItem('puzzle_scr', currentScore);
-            localStorage.setItem('puzzle_stk', currentStreak);
-            localStorage.setItem('puzzle_mode', gameMode);
-            oldGameBtn.style.opacity = "1";
+            if(isGameStartedAndPlayed) {
+                localStorage.setItem('puzzle_saved_game', 'true');
+                localStorage.setItem('puzzle_lvl', currentLevel);
+                localStorage.setItem('puzzle_scr', currentScore);
+                localStorage.setItem('puzzle_stk', currentStreak);
+                localStorage.setItem('puzzle_mode', gameMode);
+                checkOldGameButtonStatus();
+            }
         }
 
         function updateUI() {
@@ -634,19 +621,26 @@
             }, 900);
         }
 
-        // Fresh clean setup completely bypasses ugly browser confirm boxes
-        function startFreshNewGame() {
+        // New Game Reset Board view layout without instantly modifying database records
+        function setupCleanBoardNoSave() {
             currentLevel = 1;
             currentScore = 0;
             currentStreak = 0;
-            updateUIAndStorage();
+            isGameStartedAndPlayed = false; // Lock stays safe until turn plays
+            updateUI();
+            checkOldGameButtonStatus();
             generateQuestion();
         }
 
         function selectMode(mode) {
             gameMode = mode;
             setActiveModeVisual(mode);
-            updateUIAndStorage();
+            // Mode changes cleanly on active board layout
+            if(isGameStartedAndPlayed) {
+                updateUIAndStorage();
+            } else {
+                updateUI();
+            }
             generateQuestion();
             modeModal.classList.remove('active');
         }
@@ -661,12 +655,10 @@
             }
         }
 
-        // Dummy/Mock Design list generation for Offline Testing
         function buildLeaderboardUI() {
             userHighStreakText.innerText = highestStreak;
             leaderboardRankContainer.innerHTML = "";
 
-            // User is safely anchored at Rank 1 dynamically
             let htmlStr = `<div class="rank-item" style="border-color:#FBBF24; background:#2D2114;">
                 <span class="rank-number">🥇 Rank 1</span>
                 <span>${playerEmoji} <b>${playerName} (You)</b></span>
@@ -715,9 +707,7 @@
             modeModal.classList.add('active');
         };
         
-        // Setup direct click actions without popups
-        newGameBtn.onclick = startFreshNewGame;
-        oldGameBtn.onclick = loadOldGameMemories;
+        newGameBtn.onclick = setupCleanBoardNoSave;
     </script>
 </body>
 </html>
