@@ -21,9 +21,9 @@
             color: #FFF;
         }
 
-        /* Security & Loading Screen Styling */
+        /* Dynamic Offline Screen Styling */
         #security-screen {
-            display: flex; /* Starts as flex to handle initial check smoothly */
+            display: none; /* Hidden by default */
             flex-direction: column;
             justify-content: center;
             align-items: center;
@@ -55,7 +55,7 @@
 
         /* Main Game UI Container */
         .game-container {
-            display: none; /* Initially hidden until check passes */
+            display: flex; 
             width: 100%;
             max-width: 400px;
             padding: 20px;
@@ -269,9 +269,9 @@
 <body>
 
     <div id="security-screen">
-        <div class="security-emoji" id="screen-emoji">⏳</div>
-        <div class="security-title" id="screen-title">Loading Arena...</div>
-        <div class="security-text" id="screen-text">Please wait while we optimize your gaming environment.</div>
+        <div class="security-emoji" id="screen-emoji">😢</div>
+        <div class="security-title" id="screen-title">No Internet Connection</div>
+        <div class="security-text" id="screen-text">Please turn on your mobile data or Wi-Fi to resume your game.</div>
     </div>
 
     <div class="game-container" id="main-game-container">
@@ -319,7 +319,7 @@
         </div>
     </div>
 
-    <script>
+    <script {nonce}>
         let currentLevel = 1;
         let currentScore = 0;
         let currentStreak = 0;
@@ -355,51 +355,35 @@
         const screenText = document.getElementById('screen-text');
 
         window.onload = function() {
-            // Added 1.5 seconds smart delay to allow browsers to resolve accurate navigator.onLine state
-            setTimeout(runEnvironmentCheck, 1500);
+            checkNetworkOnly(); // Checking only network during production stage
         };
 
-        // Environment, Network & APK Security Check Function
-        function runEnvironmentCheck() {
-            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-            
-            // Check if opened inside a WebView (Android App Container)
-            const isWebView = /wv|WebView|Android.*Version\/[0-9.]+/i.test(userAgent);
-
-            // 1. Network Status Check (Offline Handler)
+        // Pure Network Status Checker 
+        function checkNetworkOnly() {
             if (!navigator.onLine) {
-                showBlockScreen('😢', 'No Internet Connection', 'Please turn on your mobile data or Wi-Fi and restart the app to play.');
-                return;
-            }
-
-            // 2. APK Boundary Check (Blocks standard mobile/desktop browsers)
-            if (isWebView) {
-                // Verified App Environment -> Show Game
-                securityScreen.style.style.setProperty('display', 'none', 'important');
-                mainGameContainer.style.style.setProperty('display', 'flex', 'important');
-                resetGameBoard();
+                showBlockScreen('😢', 'No Internet Connection', 'Please turn on your mobile data or Wi-Fi to start the match.');
             } else {
-                // Browser detection fallback -> Blocks unauthorized web traffic
-                showBlockScreen('🔒', 'Official App Required', 'This game can only be played inside our official app. Please download it from the Indus App Store!');
+                securityScreen.style.setProperty('display', 'none', 'important');
+                mainGameContainer.style.setProperty('display', 'flex', 'important');
+                resetGameBoard();
             }
         }
 
         function showBlockScreen(emoji, title, text) {
-            mainGameContainer.style.style.setProperty('display', 'none', 'important');
-            securityScreen.style.style.setProperty('display', 'flex', 'important');
+            mainGameContainer.style.setProperty('display', 'none', 'important');
+            securityScreen.style.setProperty('display', 'flex', 'important');
             screenEmoji.innerText = emoji;
             screenTitle.innerText = title;
             screenText.innerText = text;
         }
 
-        // Network State Listeners to change screens dynamically
+        // Live Network Listeners
         window.addEventListener('offline', function() {
             showBlockScreen('😢', 'Connection Lost', 'Your internet was disconnected. Reconnect to resume your match.');
         });
 
         window.addEventListener('online', function() {
-            // Dynamic check on reconnecting
-            setTimeout(runEnvironmentCheck, 1000);
+            checkNetworkOnly();
         });
 
         // Master Audio Play Function
