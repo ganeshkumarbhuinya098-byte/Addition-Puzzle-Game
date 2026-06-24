@@ -57,7 +57,7 @@
             border: 3px solid #333;
             border-radius: 24px;
             padding: 40px 20px;
-            position: relative;
+            position: relative; 
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -65,6 +65,31 @@
             box-shadow: 0 10px 0 #000;
             background-image: radial-gradient(#444 1.5px, transparent 1.5px);
             background-size: 18px 18px;
+        }
+
+        /* Sound Control Button Positioned Top Right */
+        .sound-control-container {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            z-index: 15;
+        }
+
+        #soundToggleBtn {
+            background: #2D2D2D;
+            border: 1px solid #444;
+            color: #fff;
+            padding: 6px 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s ease;
+            box-shadow: 0 3px 0 #000;
+        }
+
+        #soundToggleBtn:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #000;
         }
 
         .current-mode-title {
@@ -218,6 +243,10 @@
         </div>
 
         <div class="puzzle-box">
+            <div class="sound-control-container">
+                <button id="soundToggleBtn">🔊</button>
+            </div>
+
             <div class="current-mode-title" id="mode-display-tag">Infinite Addition</div>
             <div class="question" id="question-text">0 <span>+</span> 0</div>
             <input type="number" class="input-box" id="answer-input" placeholder="?" inputmode="numeric">
@@ -258,6 +287,12 @@
         let gameMode = 'addition'; 
         let num1 = 0, num2 = 0, currentOperator = '+';
 
+        // Audio Management Configuration
+        let isSoundOn = true;
+        const correctSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2000/2000-84.wav'); 
+        const wrongSound = new Audio('https://assets.mixkit.co/active_storage/sfx/911/911-84.wav');     
+        const clickSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-84.wav');   
+
         const levelVal = document.getElementById('level-val');
         const scoreVal = document.getElementById('score-val');
         const streakVal = document.getElementById('streak-val');
@@ -268,6 +303,7 @@
         const switchBtn = document.getElementById('switch-btn');
         const modeModal = document.getElementById('mode-modal');
         const modeDisplayTag = document.getElementById('mode-display-tag');
+        const soundToggleBtn = document.getElementById('soundToggleBtn');
         
         const feedbackOverlay = document.getElementById('feedback-overlay');
         const feedbackIcon = document.getElementById('feedback-icon');
@@ -275,6 +311,27 @@
 
         window.onload = function() {
             resetGameBoard();
+        };
+
+        // Master Audio Play Function
+        function playSound(type) {
+            if (!isSoundOn) return; 
+            if (type === 'correct') { correctSound.currentTime = 0; correctSound.play().catch(e => {}); }
+            else if (type === 'wrong') { wrongSound.currentTime = 0; wrongSound.play().catch(e => {}); }
+            else if (type === 'click') { clickSound.currentTime = 0; clickSound.play().catch(e => {}); }
+        }
+
+        // Toggle Sound State Mute/Unmute
+        soundToggleBtn.onclick = function() {
+            isSoundOn = !isSoundOn;
+            if (isSoundOn) {
+                soundToggleBtn.innerText = "🔊";
+                soundToggleBtn.style.borderColor = "#444";
+            } else {
+                soundToggleBtn.innerText = "🔇";
+                soundToggleBtn.style.borderColor = "#EF4444";
+            }
+            playSound('click');
         };
 
         function resetGameBoard() {
@@ -285,7 +342,6 @@
             generateQuestion();
         }
 
-        // Helper to get a truly random number in a range
         function getRandom(min, max) {
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
@@ -300,18 +356,14 @@
                 currentOperator = ops[Math.floor(Math.random() * ops.length)];
             }
 
-            // --- ADDITION & SUBTRACTION LOGIC ---
             if (currentOperator === '+' || currentOperator === '-') {
                 if (currentLevel <= 2 && currentScore < 5) {
-                    // Level 1-2 & Score < 5: Easy and random (5 to 15)
                     num1 = getRandom(5, 15);
                     num2 = getRandom(3, 12);
                 } else if (currentLevel > 2 && currentScore < 5) {
-                    // Level 3+ but Score < 5: Slightly heavier
                     num1 = getRandom(15, 30);
                     num2 = getRandom(10, 25);
                 } else {
-                    // Super Heavy Explosion (Score >= 5): Challenging but mental-math friendly
                     num1 = getRandom(35, 75);
                     num2 = getRandom(20, 50);
                 }
@@ -319,23 +371,18 @@
                     let temp = num1; num1 = num2; num2 = temp;
                 }
             } 
-            // --- MULTIPLICATION LOGIC ---
             else if (currentOperator === '×') {
                 if (currentLevel <= 2 && currentScore < 5) {
-                    // Level 1-2 & Score < 5: Easy tables (Fresh randoms, no loops)
                     num1 = getRandom(3, 9);
                     num2 = getRandom(2, 8);
                 } else if (currentLevel > 2 && currentScore < 5) {
-                    // Level 3+ but Score < 5: Medium tables
                     num1 = getRandom(7, 12);
                     num2 = getRandom(4, 9);
                 } else {
-                    // Super Heavy Explosion (Score >= 5): Up to 19x9 tables
                     num1 = getRandom(11, 19);
                     num2 = getRandom(3, 9);
                 }
             } 
-            // --- DIVISION LOGIC ---
             else if (currentOperator === '➗') {
                 let divisor, quotient;
                 if (currentLevel <= 2 && currentScore < 5) {
@@ -370,14 +417,14 @@
             if (playerAns === correctAns) {
                 currentScore += 1;
                 currentStreak += 1;
-                
-                // Rules: Every 2 correct answers = Level Up
                 if (currentScore % 2 === 0) {
                     currentLevel += 1;
                 }
+                playSound('correct'); 
                 showFeedback(true);
             } else {
                 currentStreak = 0; 
+                playSound('wrong'); 
                 showFeedback(false);
             }
             updateUI();
@@ -403,6 +450,7 @@
         }
 
         function selectMode(mode) {
+            playSound('click');
             gameMode = mode;
             setActiveModeVisual(mode);
             generateQuestion();
@@ -421,9 +469,10 @@
 
         submitBtn.onclick = checkAnswer;
         answerInput.onkeydown = (e) => { if (e.key === 'Enter') checkAnswer(); };
-        switchBtn.onclick = () => modeModal.classList.add('active');
-        document.getElementById('btn-close-mode').onclick = () => modeModal.classList.remove('active');
-        newGameBtn.onclick = resetGameBoard;
+        
+        switchBtn.onclick = () => { playSound('click'); modeModal.classList.add('active'); };
+        document.getElementById('btn-close-mode').onclick = () => { playSound('click'); modeModal.classList.remove('active'); };
+        newGameBtn.onclick = () => { playSound('click'); resetGameBoard(); };
 
         document.getElementById('mode-add').onclick = () => selectMode('addition');
         document.getElementById('mode-sub').onclick = () => selectMode('subtraction');
