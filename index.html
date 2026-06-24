@@ -21,9 +21,9 @@
             color: #FFF;
         }
 
-        /* Security Screen Styling */
+        /* Security & Loading Screen Styling */
         #security-screen {
-            display: none;
+            display: flex; /* Starts as flex to handle initial check smoothly */
             flex-direction: column;
             justify-content: center;
             align-items: center;
@@ -55,7 +55,7 @@
 
         /* Main Game UI Container */
         .game-container {
-            display: flex; /* Script will handle visibility */
+            display: none; /* Initially hidden until check passes */
             width: 100%;
             max-width: 400px;
             padding: 20px;
@@ -269,12 +269,12 @@
 <body>
 
     <div id="security-screen">
-        <div class="security-emoji" id="screen-emoji">📱</div>
-        <div class="security-title" id="screen-title">Access Restricted</div>
-        <div class="security-text" id="screen-text">This game can only be played inside our official app. Please download it from the Indus App Store!</div>
+        <div class="security-emoji" id="screen-emoji">⏳</div>
+        <div class="security-title" id="screen-title">Loading Arena...</div>
+        <div class="security-text" id="screen-text">Please wait while we optimize your gaming environment.</div>
     </div>
 
-    <div class="game-container" id="main-game-container" style="display: none;">
+    <div class="game-container" id="main-game-container">
         <div class="stats-bar">
             <div class="stat-item" style="color: #A855F7;">📈 LVL: <span id="level-val">1</span></div>
             <div class="stat-item" style="color: #06B6D4;">🏆 SCR: <span id="score-val">0</span></div>
@@ -355,7 +355,8 @@
         const screenText = document.getElementById('screen-text');
 
         window.onload = function() {
-            runEnvironmentCheck();
+            // Added 1.5 seconds smart delay to allow browsers to resolve accurate navigator.onLine state
+            setTimeout(runEnvironmentCheck, 1500);
         };
 
         // Environment, Network & APK Security Check Function
@@ -363,7 +364,6 @@
             const userAgent = navigator.userAgent || navigator.vendor || window.opera;
             
             // Check if opened inside a WebView (Android App Container)
-            // Most APK wrappers append 'wv' or specific package token strings
             const isWebView = /wv|WebView|Android.*Version\/[0-9.]+/i.test(userAgent);
 
             // 1. Network Status Check (Offline Handler)
@@ -374,9 +374,9 @@
 
             // 2. APK Boundary Check (Blocks standard mobile/desktop browsers)
             if (isWebView) {
-                // Verified App Environment
-                securityScreen.style.display = 'none';
-                mainGameContainer.style.display = 'flex';
+                // Verified App Environment -> Show Game
+                securityScreen.style.style.setProperty('display', 'none', 'important');
+                mainGameContainer.style.style.setProperty('display', 'flex', 'important');
                 resetGameBoard();
             } else {
                 // Browser detection fallback -> Blocks unauthorized web traffic
@@ -385,8 +385,8 @@
         }
 
         function showBlockScreen(emoji, title, text) {
-            mainGameContainer.style.display = 'none';
-            securityScreen.style.display = 'flex';
+            mainGameContainer.style.style.setProperty('display', 'none', 'important');
+            securityScreen.style.style.setProperty('display', 'flex', 'important');
             screenEmoji.innerText = emoji;
             screenTitle.innerText = title;
             screenText.innerText = text;
@@ -398,7 +398,8 @@
         });
 
         window.addEventListener('online', function() {
-            runEnvironmentCheck();
+            // Dynamic check on reconnecting
+            setTimeout(runEnvironmentCheck, 1000);
         });
 
         // Master Audio Play Function
