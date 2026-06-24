@@ -21,38 +21,6 @@
             color: #FFF;
         }
 
-        /* Dynamic Offline Screen Styling */
-        #security-screen {
-            display: none; /* Hidden by default */
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 30px;
-            gap: 20px;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #121212;
-            z-index: 9999;
-        }
-
-        .security-emoji {
-            font-size: 80px;
-        }
-
-        .security-title {
-            font-size: 24px;
-            font-weight: bold;
-            color: #FBBF24;
-        }
-
-        .security-text {
-            font-size: 16px;
-            color: #AAA;
-            max-width: 300px;
-            line-height: 1.5;
-        }
-
         /* Main Game UI Container */
         .game-container {
             display: flex; 
@@ -268,12 +236,6 @@
 </head>
 <body>
 
-    <div id="security-screen">
-        <div class="security-emoji" id="screen-emoji">😢</div>
-        <div class="security-title" id="screen-title">No Internet Connection</div>
-        <div class="security-text" id="screen-text">Please turn on your mobile data or Wi-Fi to resume your game.</div>
-    </div>
-
     <div class="game-container" id="main-game-container">
         <div class="stats-bar">
             <div class="stat-item" style="color: #A855F7;">📈 LVL: <span id="level-val">1</span></div>
@@ -319,7 +281,7 @@
         </div>
     </div>
 
-    <script {nonce}>
+    <script>
         let currentLevel = 1;
         let currentScore = 0;
         let currentStreak = 0;
@@ -348,43 +310,9 @@
         const feedbackIcon = document.getElementById('feedback-icon');
         const feedbackText = document.getElementById('feedback-text');
 
-        const securityScreen = document.getElementById('security-screen');
-        const mainGameContainer = document.getElementById('main-game-container');
-        const screenEmoji = document.getElementById('screen-emoji');
-        const screenTitle = document.getElementById('screen-title');
-        const screenText = document.getElementById('screen-text');
-
         window.onload = function() {
-            checkNetworkOnly(); // Checking only network during production stage
+            resetGameBoard(); // Directly launch the board cleanly
         };
-
-        // Pure Network Status Checker 
-        function checkNetworkOnly() {
-            if (!navigator.onLine) {
-                showBlockScreen('😢', 'No Internet Connection', 'Please turn on your mobile data or Wi-Fi to start the match.');
-            } else {
-                securityScreen.style.setProperty('display', 'none', 'important');
-                mainGameContainer.style.setProperty('display', 'flex', 'important');
-                resetGameBoard();
-            }
-        }
-
-        function showBlockScreen(emoji, title, text) {
-            mainGameContainer.style.setProperty('display', 'none', 'important');
-            securityScreen.style.setProperty('display', 'flex', 'important');
-            screenEmoji.innerText = emoji;
-            screenTitle.innerText = title;
-            screenText.innerText = text;
-        }
-
-        // Live Network Listeners
-        window.addEventListener('offline', function() {
-            showBlockScreen('😢', 'Connection Lost', 'Your internet was disconnected. Reconnect to resume your match.');
-        });
-
-        window.addEventListener('online', function() {
-            checkNetworkOnly();
-        });
 
         // Master Audio Play Function
         function playSound(type) {
