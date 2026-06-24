@@ -21,11 +21,44 @@
             color: #FFF;
         }
 
+        /* Security Screen Styling */
+        #security-screen {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 30px;
+            gap: 20px;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #121212;
+            z-index: 9999;
+        }
+
+        .security-emoji {
+            font-size: 80px;
+        }
+
+        .security-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #FBBF24;
+        }
+
+        .security-text {
+            font-size: 16px;
+            color: #AAA;
+            max-width: 300px;
+            line-height: 1.5;
+        }
+
+        /* Main Game UI Container */
         .game-container {
+            display: flex; /* Script will handle visibility */
             width: 100%;
             max-width: 400px;
             padding: 20px;
-            display: flex;
             flex-direction: column;
             align-items: center;
             gap: 20px;
@@ -235,7 +268,13 @@
 </head>
 <body>
 
-    <div class="game-container">
+    <div id="security-screen">
+        <div class="security-emoji" id="screen-emoji">📱</div>
+        <div class="security-title" id="screen-title">Access Restricted</div>
+        <div class="security-text" id="screen-text">This game can only be played inside our official app. Please download it from the Indus App Store!</div>
+    </div>
+
+    <div class="game-container" id="main-game-container" style="display: none;">
         <div class="stats-bar">
             <div class="stat-item" style="color: #A855F7;">📈 LVL: <span id="level-val">1</span></div>
             <div class="stat-item" style="color: #06B6D4;">🏆 SCR: <span id="score-val">0</span></div>
@@ -309,9 +348,58 @@
         const feedbackIcon = document.getElementById('feedback-icon');
         const feedbackText = document.getElementById('feedback-text');
 
+        const securityScreen = document.getElementById('security-screen');
+        const mainGameContainer = document.getElementById('main-game-container');
+        const screenEmoji = document.getElementById('screen-emoji');
+        const screenTitle = document.getElementById('screen-title');
+        const screenText = document.getElementById('screen-text');
+
         window.onload = function() {
-            resetGameBoard();
+            runEnvironmentCheck();
         };
+
+        // Environment, Network & APK Security Check Function
+        function runEnvironmentCheck() {
+            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            
+            // Check if opened inside a WebView (Android App Container)
+            // Most APK wrappers append 'wv' or specific package token strings
+            const isWebView = /wv|WebView|Android.*Version\/[0-9.]+/i.test(userAgent);
+
+            // 1. Network Status Check (Offline Handler)
+            if (!navigator.onLine) {
+                showBlockScreen('😢', 'No Internet Connection', 'Please turn on your mobile data or Wi-Fi and restart the app to play.');
+                return;
+            }
+
+            // 2. APK Boundary Check (Blocks standard mobile/desktop browsers)
+            if (isWebView) {
+                // Verified App Environment
+                securityScreen.style.display = 'none';
+                mainGameContainer.style.display = 'flex';
+                resetGameBoard();
+            } else {
+                // Browser detection fallback -> Blocks unauthorized web traffic
+                showBlockScreen('🔒', 'Official App Required', 'This game can only be played inside our official app. Please download it from the Indus App Store!');
+            }
+        }
+
+        function showBlockScreen(emoji, title, text) {
+            mainGameContainer.style.display = 'none';
+            securityScreen.style.display = 'flex';
+            screenEmoji.innerText = emoji;
+            screenTitle.innerText = title;
+            screenText.innerText = text;
+        }
+
+        // Network State Listeners to change screens dynamically
+        window.addEventListener('offline', function() {
+            showBlockScreen('😢', 'Connection Lost', 'Your internet was disconnected. Reconnect to resume your match.');
+        });
+
+        window.addEventListener('online', function() {
+            runEnvironmentCheck();
+        });
 
         // Master Audio Play Function
         function playSound(type) {
