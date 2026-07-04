@@ -288,11 +288,13 @@
         let gameMode = 'addition'; 
         let num1 = 0, num2 = 0, currentOperator = '+';
 
-        // Audio Management Configuration
+        // Audio Management Configuration (GitHub Local Paths)
         let isSoundOn = true;
-        const correctSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2000/2000-84.wav'); 
-        const wrongSound = new Audio('https://assets.mixkit.co/active_storage/sfx/911/911-84.wav');     
-        const clickSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-84.wav');   
+        const correctSound = new Audio('correct.mp3'); 
+        const wrongSound = new Audio('wrong.mp3');     
+        const clickSound = new Audio('click.mp3');   
+        const bgmSound = new Audio('bgm.mp3');
+        bgmSound.loop = true; // Loop background music
 
         const levelVal = document.getElementById('level-val');
         const scoreVal = document.getElementById('score-val');
@@ -312,6 +314,12 @@
 
         window.onload = function() {
             resetGameBoard(); // Directly launch the board cleanly
+            // Attempt to autoplay BGM on load
+            document.body.addEventListener('click', () => {
+                if (isSoundOn && bgmSound.paused) {
+                    bgmSound.play().catch(e => {});
+                }
+            }, { once: true });
         };
 
         // Master Audio Play Function
@@ -328,9 +336,11 @@
             if (isSoundOn) {
                 soundToggleBtn.innerText = "🔊";
                 soundToggleBtn.style.borderColor = "#444";
+                bgmSound.play().catch(e => {});
             } else {
                 soundToggleBtn.innerText = "🔇";
                 soundToggleBtn.style.borderColor = "#EF4444";
+                bgmSound.pause();
             }
             playSound('click');
         };
