@@ -291,9 +291,13 @@
         // Audio Management Configuration (GitHub Local Paths)
         let isSoundOn = true;
         const correctSound = new Audio('correct.mp3'); 
+        correctSound.preload = 'auto';
         const wrongSound = new Audio('wrong.mp3');     
+        wrongSound.preload = 'auto';
         const clickSound = new Audio('click.mp3');   
+        clickSound.preload = 'auto';
         const bgmSound = new Audio('bgm.mp3');
+        bgmSound.preload = 'auto';
         bgmSound.loop = true; // Loop background music
 
         const levelVal = document.getElementById('level-val');
@@ -325,9 +329,18 @@
         // Master Audio Play Function
         function playSound(type) {
             if (!isSoundOn) return; 
-            if (type === 'correct') { correctSound.currentTime = 0; correctSound.play().catch(e => {}); }
-            else if (type === 'wrong') { wrongSound.currentTime = 0; wrongSound.play().catch(e => {}); }
-            else if (type === 'click') { clickSound.currentTime = 0; clickSound.play().catch(e => {}); }
+            if (type === 'correct') { 
+                correctSound.currentTime = 0; 
+                correctSound.play().catch(e => {}); 
+            }
+            else if (type === 'wrong') { 
+                wrongSound.currentTime = 0; 
+                wrongSound.play().catch(e => {}); 
+            }
+            else if (type === 'click') { 
+                clickSound.currentTime = 0; 
+                clickSound.play().catch(e => {}); 
+            }
         }
 
         // Toggle Sound State Mute/Unmute
