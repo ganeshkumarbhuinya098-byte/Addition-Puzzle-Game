@@ -334,7 +334,8 @@
                 correctSound.play().catch(e => {}); 
             }
             else if (type === 'wrong') { 
-                wrongSound.currentTime = 0; 
+                // यहाँ 0.0 के बजाय 0.25 सेकंड सेट किया है ताकि फाइल का शुरुआती सन्नाटा कट जाए
+                wrongSound.currentTime = 0.25; 
                 wrongSound.play().catch(e => {}); 
             }
             else if (type === 'click') { 
