@@ -287,6 +287,7 @@
         let currentStreak = 0;
         let gameMode = 'addition'; 
         let num1 = 0, num2 = 0, currentOperator = '+';
+        let isProcessing = false;
 
         // Audio Management Configuration (GitHub Local Paths)
         let isSoundOn = true;
@@ -299,6 +300,12 @@
         const bgmSound = new Audio('bgm.mp3');
         bgmSound.preload = 'auto';
         bgmSound.loop = true; // Loop background music
+
+        function tryPlayBGM() {
+            if (isSoundOn && bgmSound.paused) {
+                bgmSound.play().catch(e => {});
+            }
+        }
 
         const levelVal = document.getElementById('level-val');
         const scoreVal = document.getElementById('score-val');
@@ -318,29 +325,40 @@
 
         window.onload = function() {
             resetGameBoard(); // Directly launch the board cleanly
-            // Attempt to autoplay BGM on load
-            document.body.addEventListener('click', () => {
-                if (isSoundOn && bgmSound.paused) {
-                    bgmSound.play().catch(e => {});
-                }
-            }, { once: true });
+            // Attempt to play BGM on initial user interaction
+            const enableAudioOnInteraction = () => {
+                tryPlayBGM();
+                document.removeEventListener('click', enableAudioOnInteraction);
+                document.removeEventListener('keydown', enableAudioOnInteraction);
+                document.removeEventListener('touchstart', enableAudioOnInteraction);
+            };
+            document.addEventListener('click', enableAudioOnInteraction);
+            document.addEventListener('keydown', enableAudioOnInteraction);
+            document.addEventListener('touchstart', enableAudioOnInteraction);
         };
+
+        // Safe Audio Playback Helper
+        function playAudio(audioObj) {
+            if (!isSoundOn) return;
+            try {
+                if (audioObj.readyState >= 1) {
+                    audioObj.currentTime = 0;
+                }
+            } catch (e) {}
+            audioObj.play().catch(e => {});
+        }
 
         // Master Audio Play Function
         function playSound(type) {
             if (!isSoundOn) return; 
             if (type === 'correct') { 
-                correctSound.currentTime = 0; 
-                correctSound.play().catch(e => {}); 
+                playAudio(correctSound);
             }
             else if (type === 'wrong') { 
-                // यहाँ 0.0 के बजाय 0.25 सेकंड सेट किया है ताकि फाइल का शुरुआती सन्नाटा कट जाए
-                wrongSound.currentTime = 0.25; 
-                wrongSound.play().catch(e => {}); 
+                playAudio(wrongSound);
             }
             else if (type === 'click') { 
-                clickSound.currentTime = 0; 
-                clickSound.play().catch(e => {}); 
+                playAudio(clickSound);
             }
         }
 
@@ -363,6 +381,8 @@
             currentLevel = 1;
             currentScore = 0;
             currentStreak = 0;
+            isProcessing = false;
+            feedbackOverlay.style.display = 'none';
             updateUI();
             generateQuestion();
         }
@@ -382,43 +402,46 @@
             }
 
             if (currentOperator === '+' || currentOperator === '-') {
-                if (currentLevel <= 2 && currentScore < 5) {
-                    num1 = getRandom(5, 15);
-                    num2 = getRandom(3, 12);
-                } else if (currentLevel > 2 && currentScore < 5) {
-                    num1 = getRandom(15, 30);
-                    num2 = getRandom(10, 25);
+                if (currentLevel <= 2) {
+                    num1 = getRandom(3, 15);
+                    num2 = getRandom(2, 12);
+                } else if (currentLevel <= 4) {
+                    num1 = getRandom(15, 40);
+                    num2 = getRandom(10, 30);
                 } else {
-                    num1 = getRandom(35, 75);
-                    num2 = getRandom(20, 50);
+                    const extra = (currentLevel - 4) * 10;
+                    num1 = getRandom(30, 75 + extra);
+                    num2 = getRandom(15, 50 + extra);
                 }
                 if (currentOperator === '-' && num1 < num2) {
                     let temp = num1; num1 = num2; num2 = temp;
                 }
             } 
             else if (currentOperator === '×') {
-                if (currentLevel <= 2 && currentScore < 5) {
-                    num1 = getRandom(3, 9);
-                    num2 = getRandom(2, 8);
-                } else if (currentLevel > 2 && currentScore < 5) {
-                    num1 = getRandom(7, 12);
-                    num2 = getRandom(4, 9);
-                } else {
-                    num1 = getRandom(11, 19);
+                if (currentLevel <= 2) {
+                    num1 = getRandom(2, 8);
+                    num2 = getRandom(2, 6);
+                } else if (currentLevel <= 4) {
+                    num1 = getRandom(5, 12);
                     num2 = getRandom(3, 9);
+                } else {
+                    const extra = Math.min(currentLevel - 4, 8);
+                    num1 = getRandom(7, 12 + extra);
+                    num2 = getRandom(4, 10 + Math.floor(extra / 2));
                 }
             } 
             else if (currentOperator === '➗') {
                 let divisor, quotient;
-                if (currentLevel <= 2 && currentScore < 5) {
+                if (currentLevel <= 2) {
                     divisor = getRandom(2, 6);
                     quotient = getRandom(2, 7);
-                } else if (currentLevel > 2 && currentScore < 5) {
-                    divisor = getRandom(4, 9);
-                    quotient = getRandom(4, 9);
+                } else if (currentLevel <= 4) {
+                    divisor = getRandom(3, 9);
+                    quotient = getRandom(3, 9);
                 } else {
-                    divisor = getRandom(6, 12);
-                    quotient = getRandom(6, 12);
+                    const extra = Math.min(currentLevel - 4, 8);
+                    divisor = getRandom(4, 10 + extra);
+                    quotient = getRandom(4, 10 + extra);
                 }
                 num1 = divisor * quotient; 
                 num2 = divisor;
@@ -430,8 +453,13 @@
         }
 
         function checkAnswer() {
-            const playerAns = parseInt(answerInput.value);
+            if (isProcessing) return;
+            const rawVal = answerInput.value.trim();
+            if (rawVal === '') return;
+            const playerAns = parseInt(rawVal, 10);
             if (isNaN(playerAns)) return;
+
+            isProcessing = true;
 
             let correctAns;
             if (currentOperator === '+') correctAns = num1 + num2;
@@ -471,12 +499,15 @@
                 feedbackOverlay.style.display = 'none';
                 if(isCorrect) generateQuestion(); 
                 else { answerInput.value = ''; answerInput.focus(); }
-            }, 900);
+                isProcessing = false;
+            }, 800);
         }
 
         function selectMode(mode) {
             playSound('click');
             gameMode = mode;
+            isProcessing = false;
+            feedbackOverlay.style.display = 'none';
             setActiveModeVisual(mode);
             generateQuestion();
             modeModal.classList.remove('active');
@@ -498,6 +529,32 @@
         switchBtn.onclick = () => { playSound('click'); modeModal.classList.add('active'); };
         document.getElementById('btn-close-mode').onclick = () => { playSound('click'); modeModal.classList.remove('active'); };
         newGameBtn.onclick = () => { playSound('click'); resetGameBoard(); };
+
+        // Close modal when clicking outside content area
+        modeModal.onclick = (e) => {
+            if (e.target === modeModal) {
+                playSound('click');
+                modeModal.classList.remove('active');
+            }
+        };
+
+        // Close modal or handle keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modeModal.classList.contains('active')) {
+                playSound('click');
+                modeModal.classList.remove('active');
+            }
+        });
+
+        // Restrict input field keypresses (disallow e, +, -, .)
+        answerInput.onkeydown = (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                checkAnswer();
+            } else if (['e', 'E', '+', '-', '.'].includes(e.key)) {
+                e.preventDefault();
+            }
+        };
 
         document.getElementById('mode-add').onclick = () => selectMode('addition');
         document.getElementById('mode-sub').onclick = () => selectMode('subtraction');
